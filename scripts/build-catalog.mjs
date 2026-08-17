@@ -346,17 +346,39 @@ const ENRICHMENT = {
 /** Everything remaining is stationery; brand is the first word of the title. */
 const STATIONERY_DEFAULTS = { category: "stationery", stock: 200 };
 
+/**
+ * The builder stored descriptions HTML-escaped inside an HTML attribute, so what
+ * we scrape is double-encoded: the markup arrives as `&lt;p&gt;…&lt;/p&gt;`
+ * rather than `<p>…</p>`. Rendering that as-is shows the tags to the customer,
+ * so decode one level here and store real HTML.
+ *
+ * `&amp;` is decoded LAST so `&amp;lt;` survives as the literal text `&lt;`
+ * instead of collapsing into a `<`. Running this on already-decoded HTML is a
+ * no-op, so it is safe to re-run the build.
+ */
+const decodeEntities = (input) =>
+  String(input ?? "")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&quot;/g, '"')
+    .replace(/&#0?39;|&apos;|&rsquo;/g, "'")
+    .replace(/&lsquo;/g, "'")
+    .replace(/&ldquo;|&rdquo;/g, '"')
+    .replace(/&nbsp;/g, " ")
+    .replace(/&mdash;/g, "—")
+    .replace(/&ndash;/g, "–")
+    .replace(/&hellip;/g, "…")
+    .replace(/&#(\d+);/g, (_, code) => String.fromCodePoint(Number(code)))
+    .replace(/&#x([0-9a-f]+);/gi, (_, code) => String.fromCodePoint(parseInt(code, 16)))
+    .replace(/&amp;/g, "&");
+
+/** Plain-text version of a description, for search and meta tags. */
 const stripTags = (html) =>
-  String(html ?? "")
+  decodeEntities(html)
     .replace(/<br\s*\/?>/gi, "\n")
     .replace(/<\/(p|li|ul|ol|h[1-6])>/gi, "\n")
     .replace(/<[^>]+>/g, "")
-    .replace(/&nbsp;/g, " ")
-    .replace(/&amp;/g, "&")
-    .replace(/&lt;/g, "<")
-    .replace(/&gt;/g, ">")
-    .replace(/&#39;|&rsquo;/g, "'")
-    .replace(/&quot;/g, '"')
+    .replace(/[ \t]{2,}/g, " ")
     .replace(/\n{3,}/g, "\n\n")
     .trim();
 
@@ -395,18 +417,21 @@ async function main() {
     // Legacy store stored a mixed-case ribbon; the storefront wants one badge.
     const badge = normaliseBadge(p.ribbon);
 
+    const title = decodeEntities(p.title).trim();
+    const subtitle = decodeEntities(p.subtitle).trim();
+
     const brand =
-      category === "stationery" ? p.title.trim().split(/\s+/)[0].replace(/'s$/i, "") : undefined;
+      category === "stationery" ? title.split(/\s+/)[0].replace(/'s$/i, "") : undefined;
 
     return {
       slug: p.slug,
       legacyId: p.legacyId,
       sku: skuFor(p.slug, category, i),
-      title: p.title,
-      subtitle: p.subtitle || null,
+      title,
+      subtitle: subtitle || null,
       badge,
       category,
-      descriptionHtml: p.descriptionHtml,
+      descriptionHtml: decodeEntities(p.descriptionHtml),
       description: stripTags(p.descriptionHtml),
       images: p.images,
       image: p.images[0] ?? null,
@@ -437,7 +462,7 @@ async function main() {
       // for a search service (SRS FR-1.3, free-tier constraint).
       searchTokens: [
         ...new Set(
-          [p.title, p.subtitle, extra.author, extra.language, extra.publisher, brand, ...(extra.tags ?? [])]
+          [title, subtitle, extra.author, extra.language, extra.publisher, brand, ...(extra.tags ?? [])]
             .filter(Boolean)
             .join(" ")
             .toLowerCase()
