@@ -1,0 +1,212 @@
+"use client";
+
+import { useEffect, useState } from "react";
+
+import { useCatalog } from "@/lib/catalog-context";
+import { isFirebaseConfigured } from "@/lib/firebase";
+import { saveSettings } from "@/lib/repo";
+import { useToast } from "@/lib/toast-context";
+import type { StoreSettings } from "@/lib/types";
+import { Button, Card, Field, Input, Textarea } from "@/components/ui";
+import { PageHeader } from "@/components/admin/admin-ui";
+
+export default function AdminSettingsPage() {
+  const { settings } = useCatalog();
+  const toast = useToast();
+
+  const [draft, setDraft] = useState<StoreSettings>(settings);
+  const [busy, setBusy] = useState(false);
+  const [pincodeText, setPincodeText] = useState("");
+
+  useEffect(() => {
+    setDraft(settings);
+    setPincodeText((settings.serviceablePincodes ?? []).join(", "));
+  }, [settings]);
+
+  async function save() {
+    setBusy(true);
+    try {
+      await saveSettings({
+        ...draft,
+        freeShippingThreshold: Number(draft.freeShippingThreshold) || 0,
+        shippingFlatRate: Number(draft.shippingFlatRate) || 0,
+        serviceablePincodes: pincodeText
+          .split(",")
+          .map((p) => p.trim())
+          .filter(Boolean),
+      });
+      toast("Settings saved");
+    } catch (err) {
+      console.error(err);
+      toast("Could not save settings. Check that you're signed in as an admin.", "error");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  function set<K extends keyof StoreSettings>(key: K, value: StoreSettings[K]) {
+    setDraft((prev) => ({ ...prev, [key]: value }));
+  }
+
+  return (
+    <div>
+      <PageHeader
+        title="Shop settings"
+        description="Delivery charges, payment methods and the details shown across the site."
+        action={
+          <Button onClick={save} loading={busy} disabled={!isFirebaseConfigured}>
+            Save settings
+          </Button>
+        }
+      />
+
+      <div className="grid max-w-4xl gap-6 lg:grid-cols-2">
+        {/* Delivery */}
+        <Card className="p-6">
+          <h2 className="mb-5 font-display text-lg font-semibold text-ink">Delivery</h2>
+          <div className="space-y-4">
+            <Field label="Free delivery above (₹)" hint="Orders at or above this ship free">
+              <Input
+                type="number"
+                min={0}
+                value={draft.freeShippingThreshold}
+                onChange={(e) => set("freeShippingThreshold", Number(e.target.value))}
+              />
+            </Field>
+            <Field label="Delivery charge (₹)" hint="Applied below the free-delivery threshold">
+              <Input
+                type="number"
+                min={0}
+                value={draft.shippingFlatRate}
+                onChange={(e) => set("shippingFlatRate", Number(e.target.value))}
+              />
+            </Field>
+            <Field
+              label="Serviceable PIN codes"
+              hint="Comma-separated prefixes, e.g. 440, 441. Leave blank to deliver everywhere."
+            >
+              <Textarea
+                rows={3}
+                value={pincodeText}
+                onChange={(e) => setPincodeText(e.target.value)}
+                placeholder="Leave blank to deliver across India"
+              />
+            </Field>
+          </div>
+        </Card>
+
+        {/* Payments */}
+        <Card className="p-6">
+          <h2 className="mb-5 font-display text-lg font-semibold text-ink">Payments</h2>
+          <div className="space-y-4">
+            <label className="flex cursor-pointer items-start gap-3">
+              <input
+                type="checkbox"
+                checked={draft.codEnabled}
+                onChange={(e) => set("codEnabled", e.target.checked)}
+                className="mt-0.5 size-4 accent-[var(--color-saffron)]"
+              />
+              <span>
+                <span className="block text-sm font-medium text-ink">Cash on Delivery</span>
+                <span className="block text-xs text-ink-faint">
+                  Customers pay the courier on arrival.
+                </span>
+              </span>
+            </label>
+
+            <label className="flex cursor-pointer items-start gap-3">
+              <input
+                type="checkbox"
+                checked={draft.upiEnabled}
+                onChange={(e) => set("upiEnabled", e.target.checked)}
+                className="mt-0.5 size-4 accent-[var(--color-saffron)]"
+              />
+              <span>
+                <span className="block text-sm font-medium text-ink">UPI transfer</span>
+                <span className="block text-xs text-ink-faint">
+                  Customers pay to your UPI ID and submit the reference number.
+                </span>
+              </span>
+            </label>
+
+            <Field label="UPI ID">
+              <Input
+                value={draft.upiId}
+                onChange={(e) => set("upiId", e.target.value)}
+                placeholder="yourshop@upi"
+              />
+            </Field>
+
+            <p className="rounded-xl bg-paper-sunk px-4 py-3 text-xs leading-relaxed text-ink-soft">
+              Card and net-banking payments need a payment gateway (Razorpay or PayU). Once the
+              business KYC is approved and you have API keys, that can be added on top of these
+              options without changing anything else.
+            </p>
+          </div>
+        </Card>
+
+        {/* Contact */}
+        <Card className="p-6">
+          <h2 className="mb-5 font-display text-lg font-semibold text-ink">Contact details</h2>
+          <div className="space-y-4">
+            <Field label="Contact email">
+              <Input
+                type="email"
+                value={draft.contactEmail}
+                onChange={(e) => set("contactEmail", e.target.value)}
+              />
+            </Field>
+            <Field label="Contact phone">
+              <Input
+                value={draft.contactPhone}
+                onChange={(e) => set("contactPhone", e.target.value)}
+              />
+            </Field>
+            <Field
+              label="WhatsApp number"
+              hint="Country code, no + or spaces — e.g. 917709001950"
+            >
+              <Input
+                value={draft.whatsappNumber}
+                onChange={(e) => set("whatsappNumber", e.target.value.replace(/\D/g, ""))}
+              />
+            </Field>
+          </div>
+        </Card>
+
+        {/* Announcement */}
+        <Card className="p-6">
+          <h2 className="mb-5 font-display text-lg font-semibold text-ink">Announcement bar</h2>
+          <Field
+            label="Message"
+            hint="Shown across the top of every page. Leave blank to hide the bar."
+          >
+            <Textarea
+              rows={3}
+              value={draft.announcement}
+              onChange={(e) => set("announcement", e.target.value)}
+              placeholder="Free delivery across India on orders above ₹499"
+            />
+          </Field>
+
+          {draft.announcement && (
+            <div className="mt-4">
+              <p className="mb-2 text-[0.6875rem] font-semibold uppercase tracking-[0.12em] text-ink-faint">
+                Preview
+              </p>
+              <div className="rounded-lg bg-ink px-4 py-2 text-center">
+                <p className="text-[0.6875rem] font-medium uppercase tracking-[0.14em] text-paper">
+                  {draft.announcement}
+                </p>
+              </div>
+            </div>
+          )}
+        </Card>
+      </div>
+
+      <Button className="mt-6" onClick={save} loading={busy} disabled={!isFirebaseConfigured}>
+        Save settings
+      </Button>
+    </div>
+  );
+}

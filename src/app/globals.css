@@ -1,26 +1,398 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/* ==========================================================================
+   Sugat Book Depot — design tokens
+
+   Direction (SRS §5): light, calm, monastic. Cream paper ground, ink-brown
+   text, saffron drawn from the monk robe for actions and highlights. Reads as
+   a serious literature shop, not a fashion boutique: dense typography, real
+   prices up front, restrained motion.
+   ========================================================================== */
+
+@theme {
+  /* Paper / surfaces */
+  --color-paper: #fbf7ef;
+  --color-paper-raised: #fffdf8;
+  --color-paper-sunk: #f3ead9;
+  --color-paper-deep: #ebdfc9;
+
+  /* Ink */
+  --color-ink: #241d16;
+  --color-ink-soft: #5b5044;
+  --color-ink-faint: #8b7f70;
+
+  /* Saffron — the robe colour, used for primary actions */
+  --color-saffron: #c2661a;
+  --color-saffron-bright: #e08a2b;
+  --color-saffron-deep: #9c4f12;
+  --color-saffron-wash: #fdf1e0;
+
+  /* Supporting */
+  --color-ochre: #a8801f;
+  --color-maroon: #7b2d26;
+  --color-sage: #5f6f55;
+  --color-leaf: #3f6b4a;
+
+  /* Lines */
+  --color-rule: rgba(36, 29, 22, 0.12);
+  --color-rule-strong: rgba(36, 29, 22, 0.22);
+
+  /* Type */
+  --font-display: var(--font-fraunces), Georgia, "Times New Roman", serif;
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-deva: var(--font-noto-deva), var(--font-inter), sans-serif;
+
+  /* Motion */
+  --ease-paper: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-spring: cubic-bezier(0.34, 1.36, 0.64, 1);
+
+  /* Layered, warm shadows — never a cold grey drop shadow */
+  --shadow-page: 0 1px 2px rgba(36, 29, 22, 0.05), 0 4px 12px rgba(36, 29, 22, 0.05);
+  --shadow-lift: 0 2px 4px rgba(36, 29, 22, 0.06), 0 12px 28px rgba(36, 29, 22, 0.1);
+  --shadow-book: 0 2px 3px rgba(36, 29, 22, 0.08), 0 10px 24px rgba(36, 29, 22, 0.14);
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+/* --------------------------------------------------------------------------
+   Base
+   -------------------------------------------------------------------------- */
+
+* {
+  border-color: var(--color-rule);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--color-paper);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  font-synthesis-weight: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  /* Very fine paper grain. Two offset radial dots, cheap and non-repeating
+     enough to avoid a visible tile. */
+  background-image:
+    radial-gradient(circle at 15% 25%, rgba(168, 128, 31, 0.045) 0 1px, transparent 1.5px),
+    radial-gradient(circle at 68% 72%, rgba(123, 45, 38, 0.035) 0 1px, transparent 1.5px);
+  background-size: 47px 47px, 61px 61px;
+}
+
+/* Devanagari titles (Marathi/Hindi) get a matching serif so mixed-script
+   headings do not fall back to a mismatched system font. */
+:lang(mr),
+:lang(hi),
+.deva {
+  font-family: var(--font-deva);
+}
+
+::selection {
+  background: var(--color-saffron);
+  color: #fff;
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-saffron);
+  outline-offset: 3px;
+  border-radius: 3px;
+}
+
+/* Warm, thin scrollbar so the chrome matches the paper */
+@supports (scrollbar-color: auto) {
+  html {
+    scrollbar-color: var(--color-paper-deep) transparent;
+    scrollbar-width: thin;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Utilities
+   -------------------------------------------------------------------------- */
+
+@utility container-page {
+  width: 100%;
+  margin-inline: auto;
+  padding-inline: 1rem;
+  max-width: 88rem;
+  @media (width >= 40rem) {
+    padding-inline: 1.5rem;
+  }
+  @media (width >= 64rem) {
+    padding-inline: 2.5rem;
+  }
+}
+
+/* Letterpress-style small caps label used above section headings */
+@utility eyebrow {
+  font-family: var(--font-sans);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--color-saffron-deep);
+}
+
+@utility rule-ornament {
+  position: relative;
+  &::after {
+    content: "";
+    display: block;
+    width: 3.5rem;
+    height: 2px;
+    margin-top: 0.85rem;
+    background: linear-gradient(
+      90deg,
+      var(--color-saffron) 0%,
+      var(--color-ochre) 55%,
+      transparent 100%
+    );
+    border-radius: 2px;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   The book object
+
+   Product covers are rendered as physical books: a darkened spine down the
+   left edge, stacked page edges down the right, and a hinge highlight. On
+   hover the book opens slightly toward the reader.
+   -------------------------------------------------------------------------- */
+
+.book-stage {
+  perspective: 1400px;
+  perspective-origin: 50% 40%;
+}
+
+.book {
+  position: relative;
+  transform-style: preserve-3d;
+  transition:
+    transform 0.55s var(--ease-paper),
+    box-shadow 0.55s var(--ease-paper);
+  will-change: transform;
+  box-shadow: var(--shadow-book);
+  border-radius: 3px 6px 6px 3px;
+  overflow: hidden;
+  background: var(--color-paper-sunk);
+}
+
+.book-stage:hover .book,
+.book-stage:focus-within .book {
+  transform: rotateY(-11deg) rotateX(2.5deg) translateZ(14px);
+  box-shadow:
+    0 4px 6px rgba(36, 29, 22, 0.1),
+    0 22px 44px rgba(36, 29, 22, 0.2);
+}
+
+/* Spine: darker gradient hugging the left edge, plus the hinge crease */
+.book::before {
+  content: "";
+  position: absolute;
+  inset-block: 0;
+  left: 0;
+  width: 13%;
+  max-width: 22px;
+  z-index: 2;
+  pointer-events: none;
+  background:
+    linear-gradient(90deg, rgba(0, 0, 0, 0.42) 0%, rgba(0, 0, 0, 0.16) 42%, rgba(0, 0, 0, 0) 100%),
+    linear-gradient(90deg, transparent 0 62%, rgba(255, 255, 255, 0.16) 66%, transparent 72%);
+}
+
+/* Page edges: fine vertical striping on the fore edge */
+.book::after {
+  content: "";
+  position: absolute;
+  inset-block: 2%;
+  right: 0;
+  width: 5px;
+  z-index: 2;
+  pointer-events: none;
+  border-radius: 0 3px 3px 0;
+  background: repeating-linear-gradient(
+    90deg,
+    #f7f1e4 0 1px,
+    #d9cdb6 1px 2px
+  );
+  box-shadow: inset -1px 0 2px rgba(36, 29, 22, 0.28);
+}
+
+/* Books that are really objects (statues, pens, robes) skip the paper edges */
+.book--object::after {
+  display: none;
+}
+.book--object::before {
+  width: 8%;
+  background: linear-gradient(90deg, rgba(0, 0, 0, 0.2) 0%, rgba(0, 0, 0, 0) 100%);
+}
+
+/* Shelf line under a row of books */
+.shelf {
+  position: relative;
+}
+.shelf::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1.5rem;
+  height: 3px;
+  border-radius: 3px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--color-paper-deep) 8%,
+    var(--color-paper-deep) 92%,
+    transparent 100%
+  );
+  box-shadow: 0 2px 8px rgba(36, 29, 22, 0.08);
+}
+
+/* --------------------------------------------------------------------------
+   Motion
+   -------------------------------------------------------------------------- */
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes shimmer {
+  from {
+    background-position: -200% 0;
+  }
+  to {
+    background-position: 200% 0;
+  }
+}
+
+@keyframes drift {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-12px) rotate(1.2deg);
+  }
+}
+
+/* Scroll reveal: elements start hidden and are released by an
+   IntersectionObserver adding [data-visible]. */
+.reveal {
+  opacity: 0;
+  transform: translateY(22px);
+  transition:
+    opacity 0.7s var(--ease-paper),
+    transform 0.7s var(--ease-paper);
+  transition-delay: var(--reveal-delay, 0ms);
+}
+.reveal[data-visible="true"] {
+  opacity: 1;
+  transform: none;
+}
+
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--color-paper-sunk) 25%,
+    var(--color-paper-deep) 37%,
+    var(--color-paper-sunk) 63%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.6s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  .reveal {
+    opacity: 1;
+    transform: none;
+  }
+  .book-stage:hover .book,
+  .book-stage:focus-within .book {
+    transform: none;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Rich text (product descriptions come from the CMS as HTML)
+   -------------------------------------------------------------------------- */
+
+.prose-book {
+  color: var(--color-ink-soft);
+  line-height: 1.75;
+}
+.prose-book p {
+  margin-block: 0.85em;
+}
+.prose-book p:first-child {
+  margin-top: 0;
+}
+.prose-book strong {
+  color: var(--color-ink);
+  font-weight: 600;
+}
+.prose-book em {
+  font-style: italic;
+}
+.prose-book ul {
+  margin-block: 1em;
+  padding-left: 1.15rem;
+  list-style: none;
+}
+.prose-book ul li {
+  position: relative;
+  margin-block: 0.4em;
+}
+.prose-book ul li::before {
+  content: "";
+  position: absolute;
+  left: -1.05rem;
+  top: 0.65em;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--color-saffron);
+}
+.prose-book a {
+  color: var(--color-saffron-deep);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  overflow-wrap: anywhere;
+}
+.prose-book a:hover {
+  color: var(--color-maroon);
+}
+
+/* Hide scrollbars on horizontal rails while keeping them scrollable */
+.no-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
 }

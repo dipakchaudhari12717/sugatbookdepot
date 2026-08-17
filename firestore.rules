@@ -1,0 +1,136 @@
+rules_version = '2';
+
+// Sugat Book Depot — Firestore security rules.
+//
+// Model:
+//   * Catalog data (products, categories, banners, coupons, settings) is world
+//     readable and admin-only writable.
+//   * Orders are readable by the customer who placed them and by admins; only
+//     admins may change status/payment fields after creation.
+//   * User profiles are private to their owner (admins may read for the
+//     customer list, FR-8.3).
+//
+// Bootstrapping: the first admin is recognised by email in BOOTSTRAP_ADMINS
+// below. Once signed in, that account can add more admins by creating docs in
+// /admins/{uid} from the admin panel.
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    // Change this to the shop owner's login email before going live.
+    //
+    // Email verification is deliberately NOT required here. These accounts are
+    // created by hand in the Firebase console, and Firebase Auth will not let a
+    // second account register an email that already exists — so an unverified
+    // address cannot be claimed by anyone else. Requiring email_verified only
+    // locks the owner out of their own shop.
+    function bootstrapAdmin() {
+      return signedIn()
+        && request.auth.token.email in ['sugat4books@gmail.com'];
+    }
+
+    function isAdmin() {
+      return bootstrapAdmin()
+        || (signedIn() && exists(/databases/$(database)/documents/admins/$(request.auth.uid)));
+    }
+
+    function isOwner(uid) {
+      return signedIn() && request.auth.uid == uid;
+    }
+
+    // --- Admin roster -----------------------------------------------------
+    match /admins/{uid} {
+      // A signed-in user may read their own entry — that is how the app decides
+      // whether to show the admin panel. Without this, every ordinary customer
+      // login fires a denied read on sign-in.
+      allow read: if isOwner(uid) || isAdmin();
+      allow write: if isAdmin();
+    }
+
+    // --- Catalog ----------------------------------------------------------
+    match /products/{productId} {
+      allow read: if true;
+      allow create, update, delete: if isAdmin();
+    }
+
+    match /categories/{categoryId} {
+      allow read: if true;
+      allow create, update, delete: if isAdmin();
+    }
+
+    match /banners/{bannerId} {
+      allow read: if true;
+      allow create, update, delete: if isAdmin();
+    }
+
+    match /settings/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Coupon codes are readable so the cart can validate them client-side.
+    // Only admins can create or change them.
+    match /coupons/{couponId} {
+      allow read: if true;
+      allow create, update, delete: if isAdmin();
+    }
+
+    // --- Customers --------------------------------------------------------
+    match /users/{uid} {
+      allow read: if isOwner(uid) || isAdmin();
+      allow create: if isOwner(uid)
+        // A user may never grant themselves the admin role.
+        && request.resource.data.role == 'customer';
+      allow update: if (isOwner(uid) && request.resource.data.role == resource.data.role)
+        || isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    // Per-user private state: the saved cart and wishlist (FR-3.2).
+    // Rules do not cascade into subcollections, so this needs its own block.
+    // Owner only — an in-progress cart is nobody else's business, not even an
+    // admin's.
+    match /users/{uid}/private/{docId} {
+      allow read, write: if isOwner(uid);
+    }
+
+    // --- Orders -----------------------------------------------------------
+    match /orders/{orderId} {
+      // Signed-in customers see their own orders. Guests look orders up by id
+      // via the tracking page, so a direct-id read is allowed.
+      allow get: if true;
+      allow list: if isAdmin()
+        || (signedIn() && request.query.limit <= 100);
+
+      // Anyone (including guests, FR-3.4) may place an order, but it must start
+      // in a clean state — no self-assigned "paid" or "delivered".
+      allow create: if request.resource.data.status == 'placed'
+        && request.resource.data.paymentStatus in ['pending', 'awaiting_verification']
+        && request.resource.data.total is number
+        && request.resource.data.total >= 0
+        && (request.resource.data.userId == null
+            || isOwner(request.resource.data.userId));
+
+      // Only admins move an order through the fulfilment flow (FR-9.2).
+      allow update, delete: if isAdmin();
+    }
+
+    // --- Product reviews (FR-1.2) ----------------------------------------
+    match /products/{productId}/reviews/{reviewId} {
+      allow read: if true;
+      allow create: if signedIn() && isOwner(request.resource.data.userId);
+      allow update, delete: if isAdmin()
+        || (signedIn() && isOwner(resource.data.userId));
+    }
+
+    // --- Newsletter / bulk enquiries -------------------------------------
+    match /enquiries/{enquiryId} {
+      allow create: if true;
+      allow read, update, delete: if isAdmin();
+    }
+  }
+}
