@@ -7,7 +7,7 @@ import { WhatsAppIcon } from "./brand-icons";
 
 import { useCatalog } from "@/lib/catalog-context";
 import { cn } from "@/lib/utils";
-
+//hello world
 /**
  * Floating WhatsApp contact. The legacy site relied heavily on WhatsApp for
  * enquiries and bulk Chivar orders, so it stays a first-class entry point.
