@@ -35,7 +35,7 @@ export const metadata: Metadata = {
     template: "%s | Sugat Book Depot",
   },
   description:
-    "Thirty years of publishing and retailing Buddhist literature and Dr. Babasaheb Ambedkar's writings. Books in Marathi, Hindi, Pali and English, Chivar (monk robes), Buddha statues and stationery — delivered across India.",
+    "Established 1967. Publishing and retailing Buddhist literature and Dr. Babasaheb Ambedkar's writings. Books in Marathi, Hindi, Pali and English, Chivar (monk robes), Buddha statues and stationery — delivered across India.",
   keywords: [
     "Buddhist books",
     "Ambedkar books",
@@ -56,7 +56,7 @@ export const metadata: Metadata = {
     siteName: "Sugat Book Depot",
     title: "Sugat Book Depot — Buddhist Literature, Ambedkar Sahitya & Chivar",
     description:
-      "Thirty years of Buddhist and Ambedkarite literature, Chivar (monk robes) and devotional artefacts. Delivered across India.",
+      "Since 1967 — Buddhist and Ambedkarite literature, Chivar (monk robes) and devotional artefacts. Delivered across India.",
   },
   twitter: {
     card: "summary_large_image",

@@ -27,6 +27,22 @@ import { Badge, Button, LinkButton, Reveal, SectionHeading, Spinner } from "@/co
 
 const OBJECT_CATEGORIES = new Set(["statues", "stationery", "chivar"]);
 
+/** Option groups rendered as colour swatches rather than text pills. */
+const COLOUR_OPTIONS = new Set(["color", "colour", "shade"]);
+
+/** Approximate dye colours for the robe shades we stock. */
+const SWATCH: Record<string, string> = {
+  orange: "#E07B21",
+  brown: "#6B2F28",
+  yellow: "#E8A81C",
+  maroon: "#7B2D26",
+  saffron: "#C2661A",
+};
+
+function swatchColour(value: string) {
+  return SWATCH[value.trim().toLowerCase()] ?? "#C9BCA6";
+}
+
 export function ProductDetail({ slug }: { slug: string }) {
   const { bySlug, products, categoryBySlug, loading, settings } = useCatalog();
   const { add, toggleWishlist, inWishlist } = useCart();
@@ -51,6 +67,34 @@ export function ProductDetail({ slug }: { slug: string }) {
     setActiveImage(0);
     setQuantity(1);
   }, [product]);
+
+  /**
+   * When a product groups its photographs by an option value (the Chivar has
+   * separate shots per robe colour), show only that value's photographs.
+   * Falls back to the full set for everything else.
+   */
+  const images = useMemo(() => {
+    const all = product?.images?.length
+      ? product.images
+      : product?.image
+        ? [product.image]
+        : [];
+    const groups = product?.optionImages;
+    if (!groups) return all;
+
+    for (const [optionTitle, byValue] of Object.entries(groups)) {
+      const chosen = selected[optionTitle];
+      const forValue = chosen ? byValue?.[chosen] : null;
+      if (forValue?.length) return forValue;
+    }
+    return all;
+  }, [product, selected]);
+
+  // Swapping colour swaps the gallery, so jump back to its first photograph
+  // rather than leaving a stale (or out-of-range) index selected.
+  useEffect(() => {
+    setActiveImage(0);
+  }, [images]);
 
   const related = useMemo(() => {
     if (!product) return [];
@@ -79,11 +123,12 @@ export function ProductDetail({ slug }: { slug: string }) {
   const soldOut = !product.inStock || product.stock <= 0;
   const lowStock = !soldOut && product.stock <= 5;
   const isObject = OBJECT_CATEGORIES.has(product.category);
-  const images = product.images.length ? product.images : product.image ? [product.image] : [];
 
   function handleAdd() {
     if (!product) return;
-    add(product, quantity, selected);
+    // Carry the selected colour's photograph into the cart line, so the bag
+    // does not show an orange robe next to "Color: Brown".
+    add({ ...product, image: images[0] ?? product.image }, quantity, selected);
     setAdded(true);
     toast(
       quantity > 1
@@ -269,31 +314,76 @@ export function ProductDetail({ slug }: { slug: string }) {
           </div>
 
           {/* Options */}
-          {product.options.map((opt) => (
-            <div key={opt.title} className="mt-6">
-              <p className="mb-2.5 text-[0.8125rem] font-medium text-ink">
-                {opt.title}
-                <span className="ml-2 font-normal text-ink-faint">{selected[opt.title]}</span>
-              </p>
-              <div className="flex flex-wrap gap-2">
-                {opt.values.map((value) => (
-                  <button
-                    key={value}
-                    type="button"
-                    onClick={() => setSelected((prev) => ({ ...prev, [opt.title]: value }))}
-                    className={cn(
-                      "rounded-full border px-4 py-2 text-[0.8125rem] font-medium transition",
-                      selected[opt.title] === value
-                        ? "border-saffron bg-saffron-wash text-saffron-deep"
-                        : "border-rule-strong bg-paper-raised text-ink-soft hover:border-saffron/60 hover:text-ink",
-                    )}
-                  >
-                    {value}
-                  </button>
-                ))}
+          {product.options.map((opt) => {
+            const isColour = COLOUR_OPTIONS.has(opt.title.trim().toLowerCase());
+            return (
+              <div key={opt.title} className="mt-6">
+                <p className="mb-2.5 text-[0.8125rem] font-medium text-ink">
+                  {opt.title}
+                  <span className="ml-2 font-normal text-ink-faint">{selected[opt.title]}</span>
+                </p>
+
+                {isColour ? (
+                  <div className="flex flex-wrap gap-3">
+                    {opt.values.map((value) => {
+                      const active = selected[opt.title] === value;
+                      return (
+                        <button
+                          key={value}
+                          type="button"
+                          onClick={() => setSelected((prev) => ({ ...prev, [opt.title]: value }))}
+                          aria-pressed={active}
+                          aria-label={`${opt.title}: ${value}`}
+                          title={value}
+                          className="group flex flex-col items-center gap-1.5"
+                        >
+                          <span
+                            className={cn(
+                              "flex size-11 items-center justify-center rounded-full border-2 transition-all duration-200",
+                              active
+                                ? "border-saffron ring-2 ring-saffron/25"
+                                : "border-rule-strong group-hover:border-saffron/60",
+                            )}
+                          >
+                            <span
+                              className="size-8 rounded-full shadow-[inset_0_2px_5px_rgba(0,0,0,0.22)]"
+                              style={{ backgroundColor: swatchColour(value) }}
+                            />
+                          </span>
+                          <span
+                            className={cn(
+                              "text-[0.6875rem] font-medium transition-colors",
+                              active ? "text-saffron-deep" : "text-ink-faint group-hover:text-ink",
+                            )}
+                          >
+                            {value}
+                          </span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <div className="flex flex-wrap gap-2">
+                    {opt.values.map((value) => (
+                      <button
+                        key={value}
+                        type="button"
+                        onClick={() => setSelected((prev) => ({ ...prev, [opt.title]: value }))}
+                        className={cn(
+                          "rounded-full border px-4 py-2 text-[0.8125rem] font-medium transition",
+                          selected[opt.title] === value
+                            ? "border-saffron bg-saffron-wash text-saffron-deep"
+                            : "border-rule-strong bg-paper-raised text-ink-soft hover:border-saffron/60 hover:text-ink",
+                        )}
+                      >
+                        {value}
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
-            </div>
-          ))}
+            );
+          })}
 
           {/* Quantity + add */}
           <div className="mt-8 flex flex-wrap items-center gap-3">

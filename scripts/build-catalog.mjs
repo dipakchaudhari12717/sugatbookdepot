@@ -106,6 +106,21 @@ const ENRICHMENT = {
     sizeGuide: [
       { label: "Free size — 2 piece set", detail: "Antaravasaka + Uttarasanga, cut to traditional monastic proportions" },
     ],
+    /**
+     * The 11 Chivar photographs cover three different robe shades. Grouping
+     * them by colour lets the product page swap the gallery when a shade is
+     * picked, instead of showing an orange robe to someone buying maroon.
+     *
+     * Classified by eye from the source photography; indexes refer to the
+     * scraped image order. Anything not listed here (the three-robe lineup,
+     * the size chart, the vihara and Sangha photographs) is shared and gets
+     * appended to whichever colour is selected.
+     */
+    colorImageIndexes: {
+      Orange: [1, 7, 4, 8],
+      Brown: [2],
+      Yellow: [0, 6],
+    },
   },
 
   // --- Statues ------------------------------------------------------------
@@ -423,6 +438,22 @@ async function main() {
     const brand =
       category === "stationery" ? title.split(/\s+/)[0].replace(/'s$/i, "") : undefined;
 
+    // Turn the curated colour->index map into colour->URL lists, with every
+    // unclaimed image appended as shared context for each shade.
+    let optionImages = null;
+    if (extra.colorImageIndexes) {
+      const claimed = new Set(Object.values(extra.colorImageIndexes).flat());
+      const shared = p.images.filter((_, idx) => !claimed.has(idx));
+      optionImages = {
+        Color: Object.fromEntries(
+          Object.entries(extra.colorImageIndexes).map(([value, indexes]) => [
+            value,
+            [...indexes.map((idx) => p.images[idx]).filter(Boolean), ...shared],
+          ]),
+        ),
+      };
+    }
+
     return {
       slug: p.slug,
       legacyId: p.legacyId,
@@ -454,6 +485,7 @@ async function main() {
       featured: extra.featured ?? false,
       tags: extra.tags ?? [],
       options: p.options,
+      optionImages,
       productType: p.productType,
       legacyCollections: p.legacyCollections,
       rating: null,

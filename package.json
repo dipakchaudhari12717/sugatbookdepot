@@ -10,8 +10,8 @@
     "scrape": "node scripts/scrape-legacy-site.mjs",
     "catalog": "node scripts/build-catalog.mjs",
     "seed": "node scripts/seed-firestore.mjs",
-    "fix:descriptions": "node scripts/fix-descriptions.mjs",
-    "rules:deploy": "firebase deploy --only firestore:rules,firestore:indexes"
+    "rules:deploy": "firebase deploy --only firestore:rules,firestore:indexes",
+    "sync:content": "node scripts/sync-product-content.mjs"
   },
   "dependencies": {
     "clsx": "^2.1.1",

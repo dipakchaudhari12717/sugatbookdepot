@@ -87,7 +87,7 @@ Before publishing, check the `bootstrapAdmin()` function near the top and make
 sure it lists the owner account you just created:
 
 ```
-request.auth.token.email in ['dipakchaudhari171@gmail.com'];
+request.auth.token.email in ['sugat4books@gmail.com'];
 ```
 
 That address is the bootstrap admin. Once signed in, more admins can be added
@@ -106,7 +106,7 @@ needs one.
 Put the owner password into `.env.local`:
 
 ```
-SEED_ADMIN_EMAIL=dipakchaudhari171@gmail.com
+SEED_ADMIN_EMAIL=sugat4books@gmail.com
 SEED_ADMIN_PASSWORD=<the password you set>
 ```
 
@@ -137,6 +137,8 @@ Sign in at **/admin** with the owner account.
 | Categories | Create and reorder the shelves shown in the navigation |
 | Coupons | Percentage or flat discounts with minimum order, cap, validity dates and usage limits |
 | Banners | Homepage promotional panels |
+| Gallery | Upload photographs with a caption and album; publish/unpublish per item |
+| Blog | Write, publish and unpublish posts with a cover image, tags and HTML body |
 | Customers | Registered and guest buyers, order counts, spend; grant or revoke admin access |
 | Enquiries | Contact form, bulk-order and newsletter submissions |
 | Settings | Delivery charges, free-shipping threshold, serviceable PIN codes, payment methods, UPI ID, contact details, announcement bar |
@@ -183,6 +185,7 @@ admin panel already exposes the refund/paid states.
 | `npm run scrape` | Re-scrape the legacy site → `data/legacy-catalog.json` |
 | `npm run catalog` | Rebuild `src/data/catalog.json` from the scrape |
 | `npm run seed` | Push the catalogue into Firestore |
+| `npm run sync:content` | Push only editorial fields (text + Chivar colour images) into Firestore, leaving prices and stock untouched |
 | `npm run rules:deploy` | Deploy `firestore.rules` + indexes (needs `firebase login` once) |
 
 `scrape` and `catalog` only matter if the old site changes before it's retired.
@@ -214,6 +217,33 @@ firestore.indexes.json     Composite indexes
 
 ---
 
+## Gallery, blog and the shop assistant
+
+**Gallery** (`/gallery`) — a masonry grid with album filters and a keyboard-navigable
+lightbox (arrow keys, Escape). Admins add photographs by URL with a title, caption,
+album and sort order, and can keep an item as a draft until it is ready.
+
+**Blog** (`/blog`, `/blog/[slug]`) — a lead story plus a card grid, tag filtering,
+reading-time estimates and related posts. Posts are written as HTML in the admin
+editor with a live preview beside the field.
+
+**Chivar colour selector** — the robe is one product with three shades. The 11
+photographs were classified by shade, so choosing Orange, Brown or Yellow swaps the
+gallery to that robe's photographs (8, 5 and 6 respectively, each topped up with the
+shared size chart and vihara shots). The chosen shade also travels into the cart, so
+the bag never shows an orange robe next to "Color: Brown". The mapping lives in
+`scripts/build-catalog.mjs` under `colorImageIndexes` — adjust it there and run
+`npm run catalog && npm run sync:content`.
+
+**Sugat Sahayak** — the chat bubble at the bottom right. It is deliberately
+rule-based rather than an LLM: it costs nothing to run, needs no API key, and can
+only ever say things the shop has approved. It answers on Chivar Daan, delivery and
+charges, payment, order tracking, returns, bulk orders, stock, shop location,
+accounts and coupons — reading live values (free-shipping threshold, UPI ID, phone)
+from your shop settings. Anything it does not recognise is handed to WhatsApp rather
+than guessed at. Edit the answers in the `RULES` array in
+`src/components/chatbot.tsx`.
+
 ## Free-tier notes
 
 Everything runs inside the Firebase Spark (free) plan:
@@ -243,3 +273,6 @@ Everything runs inside the Firebase Spark (free) plan:
    number per order, which appears on the customer's order page. Automatic label
    generation via Shiprocket/Delhivery (FR-9.1) needs a courier account.
 4. **Product reviews** have rules and a data model in place but no UI yet.
+5. **The gallery and blog start empty.** Both are admin-authored — add the first
+   photographs and posts under **Admin → Gallery** and **Admin → Blog**. Until
+   then the public pages show a friendly empty state rather than broken layout.

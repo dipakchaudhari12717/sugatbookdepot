@@ -4,7 +4,9 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   ClipboardList,
+  ImageIcon,
   LayoutGrid,
+  Newspaper,
   LogOut,
   Menu,
   MessageCircle,
@@ -31,6 +33,8 @@ const NAV = [
   { href: "/admin/categories", label: "Categories", icon: LayoutGrid },
   { href: "/admin/coupons", label: "Coupons", icon: Tag },
   { href: "/admin/banners", label: "Banners", icon: Store },
+  { href: "/admin/gallery", label: "Gallery", icon: ImageIcon },
+  { href: "/admin/blog", label: "Blog", icon: Newspaper },
   { href: "/admin/customers", label: "Customers", icon: Users },
   { href: "/admin/enquiries", label: "Enquiries", icon: MessageCircle },
   { href: "/admin/settings", label: "Settings", icon: Settings },

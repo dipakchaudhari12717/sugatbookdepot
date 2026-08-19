@@ -127,6 +127,20 @@ service cloud.firestore {
         || (signedIn() && isOwner(resource.data.userId));
     }
 
+    // --- Gallery & blog ---------------------------------------------------
+    // Both are authored in the admin panel and read by the public site.
+    // Drafts are filtered client-side, so an unpublished row is readable by
+    // anyone who queries directly — do not put anything sensitive in them.
+    match /gallery/{itemId} {
+      allow read: if true;
+      allow create, update, delete: if isAdmin();
+    }
+
+    match /posts/{postId} {
+      allow read: if true;
+      allow create, update, delete: if isAdmin();
+    }
+
     // --- Newsletter / bulk enquiries -------------------------------------
     match /enquiries/{enquiryId} {
       allow create: if true;

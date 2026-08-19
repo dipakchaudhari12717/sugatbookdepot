@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-17T12:56:45.569Z",
+  "generatedAt": "2026-08-19T11:48:12.666Z",
   "source": "https://sugatbookdepot.in",
   "categories": [
     {
@@ -119,6 +119,7 @@
         "home decor"
       ],
       "options": [],
+      "optionImages": null,
       "productType": "physical",
       "legacyCollections": [
         "Buddha statues"
@@ -214,6 +215,35 @@
           ]
         }
       ],
+      "optionImages": {
+        "Color": {
+          "Orange": [
+            "https://cdn.zyrosite.com/cdn-ecommerce/store_01JR7BMNNH74ZJ9M31G9PQTTR7/assets/36445df3-32c8-4f47-af94-e2dc06fe882b.png",
+            "https://cdn.zyrosite.com/cdn-ecommerce/store_01JR7BMNNH74ZJ9M31G9PQTTR7/assets/5f4a9650-b34b-41d9-8466-f915b650d380.jpg",
+            "https://cdn.zyrosite.com/cdn-ecommerce/store_01JR7BMNNH74ZJ9M31G9PQTTR7/assets/ffb69886-0251-4c9d-a7e2-93523b9f5d89.jpg",
+            "https://cdn.zyrosite.com/cdn-ecommerce/store_01JR7BMNNH74ZJ9M31G9PQTTR7/assets/27328488-c3af-4e8d-ba02-49e2b6547f2c.jpg",
+            "https://cdn.zyrosite.com/cdn-ecommerce/store_01JR7BMNNH74ZJ9M31G9PQTTR7/assets/f97492fc-cebf-475d-be22-ec5c84c2b7ba.png",
+            "https://cdn.zyrosite.com/cdn-ecommerce/store_01JR7BMNNH74ZJ9M31G9PQTTR7/assets/a6e6f78c-2371-4a10-80a4-3779d3385055.png",
+            "https://cdn.zyrosite.com/cdn-ecommerce/store_01JR7BMNNH74ZJ9M31G9PQTTR7/assets/ec1b9d90-683a-4e6c-a98a-17b5242b7177.webp",
+            "https://cdn.zyrosite.com/cdn-ecommerce/store_01JR7BMNNH74ZJ9M31G9PQTTR7/assets/11266cd1-3bbf-42a6-9bdf-30df1ccb453c.jpg"
+          ],
+          "Brown": [
+            "https://cdn.zyrosite.com/cdn-ecommerce/store_01JR7BMNNH74ZJ9M31G9PQTTR7/assets/e3558df7-0465-4560-b37f-5796248f8d81.jpg",
+            "https://cdn.zyrosite.com/cdn-ecommerce/store_01JR7BMNNH74ZJ9M31G9PQTTR7/assets/f97492fc-cebf-475d-be22-ec5c84c2b7ba.png",
+            "https://cdn.zyrosite.com/cdn-ecommerce/store_01JR7BMNNH74ZJ9M31G9PQTTR7/assets/a6e6f78c-2371-4a10-80a4-3779d3385055.png",
+            "https://cdn.zyrosite.com/cdn-ecommerce/store_01JR7BMNNH74ZJ9M31G9PQTTR7/assets/ec1b9d90-683a-4e6c-a98a-17b5242b7177.webp",
+            "https://cdn.zyrosite.com/cdn-ecommerce/store_01JR7BMNNH74ZJ9M31G9PQTTR7/assets/11266cd1-3bbf-42a6-9bdf-30df1ccb453c.jpg"
+          ],
+          "Yellow": [
+            "https://cdn.zyrosite.com/cdn-ecommerce/store_01JR7BMNNH74ZJ9M31G9PQTTR7/assets/8f6404bb-e9b5-4a51-972c-9f6e291eb4fe.png",
+            "https://cdn.zyrosite.com/cdn-ecommerce/store_01JR7BMNNH74ZJ9M31G9PQTTR7/assets/882999bb-ff99-4424-a1ce-9c91041978c7.jpg",
+            "https://cdn.zyrosite.com/cdn-ecommerce/store_01JR7BMNNH74ZJ9M31G9PQTTR7/assets/f97492fc-cebf-475d-be22-ec5c84c2b7ba.png",
+            "https://cdn.zyrosite.com/cdn-ecommerce/store_01JR7BMNNH74ZJ9M31G9PQTTR7/assets/a6e6f78c-2371-4a10-80a4-3779d3385055.png",
+            "https://cdn.zyrosite.com/cdn-ecommerce/store_01JR7BMNNH74ZJ9M31G9PQTTR7/assets/ec1b9d90-683a-4e6c-a98a-17b5242b7177.webp",
+            "https://cdn.zyrosite.com/cdn-ecommerce/store_01JR7BMNNH74ZJ9M31G9PQTTR7/assets/11266cd1-3bbf-42a6-9bdf-30df1ccb453c.jpg"
+          ]
+        }
+      },
       "productType": "physical",
       "legacyCollections": [
         "Buddhist Materials"
@@ -281,6 +311,7 @@
         "reference"
       ],
       "options": [],
+      "optionImages": null,
       "productType": "physical",
       "legacyCollections": [
         "BOOKS"
@@ -339,6 +370,7 @@
         "reference"
       ],
       "options": [],
+      "optionImages": null,
       "productType": "physical",
       "legacyCollections": [
         "BOOKS"
@@ -395,6 +427,7 @@
       "featured": false,
       "tags": [],
       "options": [],
+      "optionImages": null,
       "productType": "physical",
       "legacyCollections": [
         "Stationery"
@@ -450,6 +483,7 @@
       "featured": false,
       "tags": [],
       "options": [],
+      "optionImages": null,
       "productType": "physical",
       "legacyCollections": [
         "Stationery"
@@ -501,6 +535,7 @@
       "featured": false,
       "tags": [],
       "options": [],
+      "optionImages": null,
       "productType": "physical",
       "legacyCollections": [
         "Stationery"
@@ -554,6 +589,7 @@
       "featured": false,
       "tags": [],
       "options": [],
+      "optionImages": null,
       "productType": "physical",
       "legacyCollections": [
         "Stationery"
@@ -607,6 +643,7 @@
       "featured": false,
       "tags": [],
       "options": [],
+      "optionImages": null,
       "productType": "physical",
       "legacyCollections": [
         "Stationery"
@@ -659,6 +696,7 @@
       "featured": false,
       "tags": [],
       "options": [],
+      "optionImages": null,
       "productType": "physical",
       "legacyCollections": [
         "Stationery"
@@ -708,6 +746,7 @@
       "featured": false,
       "tags": [],
       "options": [],
+      "optionImages": null,
       "productType": "physical",
       "legacyCollections": [
         "Stationery"
@@ -760,6 +799,7 @@
       "featured": false,
       "tags": [],
       "options": [],
+      "optionImages": null,
       "productType": "physical",
       "legacyCollections": [
         "Stationery"
@@ -814,6 +854,7 @@
       "featured": false,
       "tags": [],
       "options": [],
+      "optionImages": null,
       "productType": "physical",
       "legacyCollections": [
         "Stationery"
@@ -865,6 +906,7 @@
       "featured": false,
       "tags": [],
       "options": [],
+      "optionImages": null,
       "productType": "physical",
       "legacyCollections": [
         "Stationery"
@@ -915,6 +957,7 @@
       "featured": false,
       "tags": [],
       "options": [],
+      "optionImages": null,
       "productType": "physical",
       "legacyCollections": [
         "Stationery"
@@ -967,6 +1010,7 @@
       "featured": false,
       "tags": [],
       "options": [],
+      "optionImages": null,
       "productType": "physical",
       "legacyCollections": [
         "Stationery"
@@ -1020,6 +1064,7 @@
       "featured": false,
       "tags": [],
       "options": [],
+      "optionImages": null,
       "productType": "physical",
       "legacyCollections": [
         "Stationery"
@@ -1073,6 +1118,7 @@
       "featured": false,
       "tags": [],
       "options": [],
+      "optionImages": null,
       "productType": "physical",
       "legacyCollections": [
         "Stationery"
@@ -1125,6 +1171,7 @@
       "featured": false,
       "tags": [],
       "options": [],
+      "optionImages": null,
       "productType": "physical",
       "legacyCollections": [
         "Stationery"
@@ -1178,6 +1225,7 @@
       "featured": false,
       "tags": [],
       "options": [],
+      "optionImages": null,
       "productType": "physical",
       "legacyCollections": [
         "Stationery"
@@ -1228,6 +1276,7 @@
       "featured": false,
       "tags": [],
       "options": [],
+      "optionImages": null,
       "productType": "physical",
       "legacyCollections": [
         "Stationery"
@@ -1278,6 +1327,7 @@
       "featured": false,
       "tags": [],
       "options": [],
+      "optionImages": null,
       "productType": "physical",
       "legacyCollections": [
         "Stationery"
@@ -1331,6 +1381,7 @@
       "featured": false,
       "tags": [],
       "options": [],
+      "optionImages": null,
       "productType": "physical",
       "legacyCollections": [
         "Stationery"
@@ -1388,6 +1439,7 @@
         "social reform"
       ],
       "options": [],
+      "optionImages": null,
       "productType": "physical",
       "legacyCollections": [
         "Buddhist Books"
@@ -1457,6 +1509,7 @@
         "teachings"
       ],
       "options": [],
+      "optionImages": null,
       "productType": "physical",
       "legacyCollections": [
         "Buddhist Books"
@@ -1529,6 +1582,7 @@
         "practice"
       ],
       "options": [],
+      "optionImages": null,
       "productType": "physical",
       "legacyCollections": [
         "Buddhist Books"
@@ -1594,6 +1648,7 @@
         "children"
       ],
       "options": [],
+      "optionImages": null,
       "productType": "physical",
       "legacyCollections": [
         "Buddhist Books"
@@ -1654,6 +1709,7 @@
         "social thought"
       ],
       "options": [],
+      "optionImages": null,
       "productType": "physical",
       "legacyCollections": [],
       "rating": null,
@@ -1714,6 +1770,7 @@
         "classic"
       ],
       "options": [],
+      "optionImages": null,
       "productType": "physical",
       "legacyCollections": [],
       "rating": null,
@@ -1776,6 +1833,7 @@
         "social reform"
       ],
       "options": [],
+      "optionImages": null,
       "productType": "physical",
       "legacyCollections": [],
       "rating": null,
@@ -1838,6 +1896,7 @@
         "religion"
       ],
       "options": [],
+      "optionImages": null,
       "productType": "physical",
       "legacyCollections": [],
       "rating": null,
@@ -1898,6 +1957,7 @@
         "ambedkar"
       ],
       "options": [],
+      "optionImages": null,
       "productType": "physical",
       "legacyCollections": [],
       "rating": null,
@@ -1960,6 +2020,7 @@
         "classic"
       ],
       "options": [],
+      "optionImages": null,
       "productType": "physical",
       "legacyCollections": [],
       "rating": null,
@@ -2020,6 +2081,7 @@
         "satyashodhak"
       ],
       "options": [],
+      "optionImages": null,
       "productType": "physical",
       "legacyCollections": [],
       "rating": null,
@@ -2079,6 +2141,7 @@
         "social history"
       ],
       "options": [],
+      "optionImages": null,
       "productType": "physical",
       "legacyCollections": [],
       "rating": null,
@@ -2144,6 +2207,7 @@
         "classic"
       ],
       "options": [],
+      "optionImages": null,
       "productType": "physical",
       "legacyCollections": [],
       "rating": null,
@@ -2208,6 +2272,7 @@
         "community"
       ],
       "options": [],
+      "optionImages": null,
       "productType": "physical",
       "legacyCollections": [],
       "rating": null,
@@ -2271,6 +2336,7 @@
         "dialogue"
       ],
       "options": [],
+      "optionImages": null,
       "productType": "physical",
       "legacyCollections": [],
       "rating": null,
@@ -2337,6 +2403,7 @@
         "young readers"
       ],
       "options": [],
+      "optionImages": null,
       "productType": "physical",
       "legacyCollections": [],
       "rating": null,
@@ -2401,6 +2468,7 @@
         "self-respect"
       ],
       "options": [],
+      "optionImages": null,
       "productType": "physical",
       "legacyCollections": [],
       "rating": null,
@@ -2459,6 +2527,7 @@
         "classic"
       ],
       "options": [],
+      "optionImages": null,
       "productType": "physical",
       "legacyCollections": [
         "Buddhist Books"
@@ -2517,6 +2586,7 @@
         "history"
       ],
       "options": [],
+      "optionImages": null,
       "productType": "physical",
       "legacyCollections": [],
       "rating": null,
@@ -2575,6 +2645,7 @@
         "classic"
       ],
       "options": [],
+      "optionImages": null,
       "productType": "physical",
       "legacyCollections": [],
       "rating": null,
@@ -2635,6 +2706,7 @@
         "women"
       ],
       "options": [],
+      "optionImages": null,
       "productType": "physical",
       "legacyCollections": [],
       "rating": null,
@@ -2692,6 +2764,7 @@
         "bhakti"
       ],
       "options": [],
+      "optionImages": null,
       "productType": "physical",
       "legacyCollections": [],
       "rating": null,
@@ -2751,6 +2824,7 @@
         "buddhism"
       ],
       "options": [],
+      "optionImages": null,
       "productType": "physical",
       "legacyCollections": [],
       "rating": null,
@@ -2808,6 +2882,7 @@
         "politics"
       ],
       "options": [],
+      "optionImages": null,
       "productType": "physical",
       "legacyCollections": [],
       "rating": null,

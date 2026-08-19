@@ -1,16 +1,15 @@
 /**
- * Repairs the double-encoded product text already sitting in Firestore.
+ * Pushes editorial content from src/data/catalog.json into Firestore.
  *
- * The catalogue was seeded before the entity-decoding fix, so descriptions are
- * stored as `&lt;p&gt;…` and render as visible tags. This script rewrites ONLY
- * the text fields from the corrected src/data/catalog.json:
+ * Use this after `npm run catalog` when the generated content changes but the
+ * commercial fields must not be touched. It rewrites ONLY:
  *
- *   title, subtitle, descriptionHtml, description, searchTokens
+ *   title, subtitle, descriptionHtml, description, searchTokens, optionImages
  *
- * Prices, stock, images, badges and category are deliberately left alone, so
- * anything edited in the admin panel since seeding survives.
+ * Prices, stock, badges, category and the plain `images` list are deliberately
+ * left alone, so anything edited in the admin panel since seeding survives.
  *
- * Run: npm run fix:descriptions
+ * Run: npm run sync:content
  */
 import { readFile } from "node:fs/promises";
 import path from "node:path";
@@ -99,12 +98,17 @@ async function main() {
       continue;
     }
 
-    const needsWork =
+    // Firestore rejects `undefined`, so normalise the optional field.
+    const nextOptionImages = source.optionImages ?? null;
+
+    const encoded =
       ENTITY.test(String(data.descriptionHtml ?? "")) ||
       ENTITY.test(String(data.title ?? "")) ||
       String(data.description ?? "").includes("<p>");
+    const optionImagesStale =
+      JSON.stringify(data.optionImages ?? null) !== JSON.stringify(nextOptionImages);
 
-    if (!needsWork) {
+    if (!encoded && !optionImagesStale) {
       alreadyClean++;
       continue;
     }
@@ -115,6 +119,7 @@ async function main() {
       descriptionHtml: source.descriptionHtml,
       description: source.description,
       searchTokens: source.searchTokens,
+      optionImages: nextOptionImages,
       updatedAt: Date.now(),
     });
     repaired++;
@@ -122,15 +127,15 @@ async function main() {
 
   if (repaired) await batch.commit();
 
-  console.log(`\nRepaired: ${repaired}`);
-  console.log(`Already clean: ${alreadyClean}`);
+  console.log(`\nUpdated: ${repaired}`);
+  console.log(`Already in sync: ${alreadyClean}`);
   if (unmatched.length) {
     console.log(
       `Skipped ${unmatched.length} product(s) with no match in catalog.json ` +
         `(added by hand in the admin panel): ${unmatched.join(", ")}`,
     );
   }
-  console.log("\nDone. Reload the site — descriptions should render as formatted text.");
+  console.log("\nDone. Reload the site to see the updated content.");
   process.exit(0);
 }
 

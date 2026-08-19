@@ -65,6 +65,12 @@ export interface Product {
   featured: boolean;
   tags: string[];
   options: ProductOption[];
+  /**
+   * Images grouped by an option value, so picking a colour swaps the gallery
+   * the way Flipkart does. Shape: { Color: { Orange: [url, ...], ... } }.
+   * Anything not listed under a value is treated as shared across all values.
+   */
+  optionImages?: Record<string, Record<string, string[]>> | null;
   searchTokens: string[];
   rating: number | null;
   reviewCount: number;
@@ -205,3 +211,47 @@ export interface StoreSettings {
   contactEmail: string;
   contactPhone: string;
 }
+
+/* -------------------------------------------------------------------------
+   Gallery & blog — both authored in the admin panel, both public to read
+   ------------------------------------------------------------------------- */
+
+export interface GalleryItem {
+  id: string;
+  title: string;
+  description: string;
+  image: string;
+  /** Free-text grouping shown as filter chips, e.g. "Shop", "Chivar Daan". */
+  album: string;
+  /** Lower numbers appear first; ties fall back to newest. */
+  order: number;
+  published: boolean;
+  takenOn: string | null;
+  createdAt: number;
+  updatedAt: number;
+}
+
+export interface BlogPost {
+  id: string;
+  slug: string;
+  title: string;
+  excerpt: string;
+  /** Body as HTML, authored in the admin editor. */
+  contentHtml: string;
+  coverImage: string | null;
+  author: string;
+  tags: string[];
+  published: boolean;
+  publishedAt: number | null;
+  readingMinutes: number;
+  createdAt: number;
+  updatedAt: number;
+}
+
+export const GALLERY_ALBUMS = [
+  "Shop",
+  "Chivar Daan",
+  "Events",
+  "Publications",
+  "Community",
+] as const;

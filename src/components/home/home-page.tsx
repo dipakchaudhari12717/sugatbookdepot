@@ -38,7 +38,7 @@ export function HomePage() {
         <div className="container-page">
           <div className="grid divide-y divide-rule sm:grid-cols-2 sm:divide-x sm:divide-y-0 lg:grid-cols-4">
             {[
-              [BookMarked, "30 years of publishing", "Sugat Prakashan, Nagpur"],
+              [BookMarked, "Established 1967", "Sugat Prakashan, Nagpur"],
               [Handshake, "Chivar Daan support", "Bulk orders for viharas"],
               [Package, "Delivered across India", "Free above ₹499"],
               [Sparkles, "Marathi · Hindi · Pali · English", "Titles in four languages"],
@@ -310,7 +310,7 @@ export function HomePage() {
                 “You didn't come this far to stop.”
               </h2>
               <p className="mt-6 text-[0.9375rem] leading-relaxed text-paper/72">
-                For three decades Sugat Book Depot has published and sold the literature of the
+                Since 1967 Sugat Book Depot has published and sold the literature of the
                 Buddhist and Ambedkarite movement — from the Pali commentaries to Babasaheb's
                 collected writings, in the languages our readers actually speak. What began as a
                 single shop in Nagpur now reaches readers, viharas and institutions across India.
@@ -331,7 +331,7 @@ export function HomePage() {
 
               <dl className="mt-12 grid grid-cols-3 gap-6 border-t border-white/12 pt-8">
                 {[
-                  ["30+", "Years of publishing"],
+                  ["1967", "Established"],
                   ["47", "Titles & products"],
                   ["4", "Languages"],
                 ].map(([value, label]) => (

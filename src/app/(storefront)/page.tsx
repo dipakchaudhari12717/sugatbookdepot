@@ -5,7 +5,7 @@ import { HomePage } from "@/components/home/home-page";
 export const metadata: Metadata = {
   title: "Sugat Book Depot — Buddhist Literature, Ambedkar Sahitya & Chivar",
   description:
-    "Thirty years of Buddhist and Ambedkarite literature in Marathi, Hindi, Pali and English. Chivar (monk robes) for Varshavas and Kathina, Buddha statues and school stationery — delivered across India.",
+    "Since 1967, Buddhist and Ambedkarite literature in Marathi, Hindi, Pali and English. Chivar (monk robes) for Varshavas and Kathina, Buddha statues and school stationery — delivered across India.",
   alternates: { canonical: "/" },
 };
 

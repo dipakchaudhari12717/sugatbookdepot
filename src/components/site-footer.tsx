@@ -59,7 +59,7 @@ export function SiteFooter() {
               </span>
             </div>
             <p className="mt-4 max-w-sm text-sm leading-relaxed text-ink-soft">
-              Thirty years of publishing and retailing Buddhist literature and the writings of
+              Since 1967, publishing and retailing Buddhist literature and the writings of
               Dr. Babasaheb Ambedkar — fostering knowledge and enlightenment.
             </p>
             <div className="mt-5 flex gap-2">
@@ -123,6 +123,8 @@ export function SiteFooter() {
                 ["Track your order", "/orders"],
                 ["My account", "/account"],
                 ["Wishlist", "/wishlist"],
+                ["Gallery", "/gallery"],
+                ["Blog", "/blog"],
                 ["About us", "/about"],
                 ["Contact", "/contact"],
                 ["Shipping & returns", "/shipping"],

@@ -33,8 +33,10 @@ import { getDb, isFirebaseConfigured } from "./firebase";
 import { FALLBACK_CATEGORIES, FALLBACK_PRODUCTS } from "./catalog-fallback";
 import type {
   Banner,
+  BlogPost,
   Category,
   Coupon,
+  GalleryItem,
   Order,
   OrderStatus,
   Product,
@@ -520,4 +522,103 @@ export function subscribeEnquiries(
 
 export async function markEnquiryHandled(id: string, handled: boolean) {
   await updateDoc(doc(getDb(), "enquiries", id), { handled });
+}
+
+/* -------------------------------------------------------------------------
+   Gallery
+   ------------------------------------------------------------------------- */
+
+/**
+ * `includeDrafts` is only ever true inside the admin panel. The storefront
+ * filters client-side rather than with a `where` clause so we do not need a
+ * composite index for a collection this small.
+ */
+export function subscribeGallery(
+  onData: (items: GalleryItem[]) => void,
+  includeDrafts = false,
+): Unsubscribe {
+  if (!isFirebaseConfigured) {
+    onData([]);
+    return () => {};
+  }
+  return onSnapshot(
+    collection(getDb(), "gallery"),
+    (snap) => {
+      const items = snap.docs
+        .map((d) => ({ ...(d.data() as GalleryItem), id: d.id }))
+        .filter((item) => includeDrafts || item.published !== false);
+      items.sort((a, b) => (a.order ?? 0) - (b.order ?? 0) || (b.createdAt ?? 0) - (a.createdAt ?? 0));
+      onData(items);
+    },
+    (err) => {
+      console.error("[repo] gallery subscription failed", err);
+      onData([]);
+    },
+  );
+}
+
+export async function saveGalleryItem(id: string | null, data: Partial<GalleryItem>) {
+  const db = getDb();
+  const now = Date.now();
+  if (id) {
+    await updateDoc(doc(db, "gallery", id), { ...data, updatedAt: now });
+    return id;
+  }
+  const ref = await addDoc(collection(db, "gallery"), { ...data, createdAt: now, updatedAt: now });
+  return ref.id;
+}
+
+export async function deleteGalleryItem(id: string) {
+  await deleteDoc(doc(getDb(), "gallery", id));
+}
+
+/* -------------------------------------------------------------------------
+   Blog
+   ------------------------------------------------------------------------- */
+
+export function subscribeBlogPosts(
+  onData: (posts: BlogPost[]) => void,
+  includeDrafts = false,
+): Unsubscribe {
+  if (!isFirebaseConfigured) {
+    onData([]);
+    return () => {};
+  }
+  return onSnapshot(
+    collection(getDb(), "posts"),
+    (snap) => {
+      const posts = snap.docs
+        .map((d) => ({ ...(d.data() as BlogPost), id: d.id }))
+        .filter((post) => includeDrafts || post.published !== false);
+      posts.sort(
+        (a, b) => (b.publishedAt ?? b.createdAt ?? 0) - (a.publishedAt ?? a.createdAt ?? 0),
+      );
+      onData(posts);
+    },
+    (err) => {
+      console.error("[repo] blog subscription failed", err);
+      onData([]);
+    },
+  );
+}
+
+export async function saveBlogPost(id: string | null, data: Partial<BlogPost>) {
+  const db = getDb();
+  const now = Date.now();
+  if (id) {
+    await updateDoc(doc(db, "posts", id), { ...data, updatedAt: now });
+    return id;
+  }
+  const ref = await addDoc(collection(db, "posts"), { ...data, createdAt: now, updatedAt: now });
+  return ref.id;
+}
+
+export async function deleteBlogPost(id: string) {
+  await deleteDoc(doc(getDb(), "posts", id));
+}
+
+/** Rough reading time so posts can show "4 min read" without a word-count field. */
+export function estimateReadingMinutes(html: string) {
+  const words = html.replace(/<[^>]+>/g, " ").trim().split(/\s+/).filter(Boolean).length;
+  return Math.max(1, Math.round(words / 200));
 }

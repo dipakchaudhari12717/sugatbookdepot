@@ -194,7 +194,20 @@ export function SiteHeader() {
                 href="/shop"
                 className="rounded-full px-3.5 py-2 text-[0.8125rem] font-medium text-ink-soft transition-colors hover:bg-paper-sunk hover:text-ink"
               >
-                All
+                All products
+              </Link>
+              <span aria-hidden className="mx-1 h-4 w-px bg-rule" />
+              <Link
+                href="/gallery"
+                className="rounded-full px-3.5 py-2 text-[0.8125rem] font-medium text-ink-soft transition-colors hover:bg-paper-sunk hover:text-ink"
+              >
+                Gallery
+              </Link>
+              <Link
+                href="/blog"
+                className="rounded-full px-3.5 py-2 text-[0.8125rem] font-medium text-ink-soft transition-colors hover:bg-paper-sunk hover:text-ink"
+              >
+                Blog
               </Link>
             </nav>
 
@@ -445,6 +458,22 @@ export function SiteHeader() {
                   className="mt-1 flex rounded-xl px-2.5 py-3 text-sm font-medium text-ink transition hover:bg-paper-sunk"
                 >
                   All products
+                </Link>
+
+                <div className="my-4 h-px bg-rule" />
+
+                <p className="eyebrow px-2 pb-2">Explore</p>
+                <Link
+                  href="/gallery"
+                  className="flex rounded-xl px-2.5 py-3 text-sm text-ink transition hover:bg-paper-sunk"
+                >
+                  Gallery
+                </Link>
+                <Link
+                  href="/blog"
+                  className="flex rounded-xl px-2.5 py-3 text-sm text-ink transition hover:bg-paper-sunk"
+                >
+                  Blog
                 </Link>
 
                 <div className="my-4 h-px bg-rule" />

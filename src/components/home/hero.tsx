@@ -54,7 +54,7 @@ export function Hero() {
               style={{ animation: "rise 0.6s var(--ease-paper) both" }}
             >
               <span className="h-px w-6 bg-saffron" />
-              Since 1995 · Nagpur
+              Established 1967 · Nagpur
             </p>
 
             <h1
@@ -70,7 +70,7 @@ export function Hero() {
               className="mt-6 max-w-lg text-base leading-relaxed text-ink-soft"
               style={{ animation: "rise 0.7s var(--ease-paper) 0.14s both" }}
             >
-              Thirty years of publishing and retailing Buddhist literature and the writings of
+              Since 1967, publishing and retailing Buddhist literature and the writings of
               Dr. Babasaheb Ambedkar — alongside Chivar for the Sangha, hand-finished Buddha
               statues, and everyday stationery.
             </p>
