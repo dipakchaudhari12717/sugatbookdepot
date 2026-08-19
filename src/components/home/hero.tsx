@@ -20,11 +20,12 @@ export function Hero() {
 
   const chivar = bySlug.get("chivar-traditional-buddhist-monk-robe-or-pure-lightweight-and-comfortable");
 
-  // Three recognisable titles behind the robe. Green covers lead, to echo the
-  // green of the Sugat logo.
+  // Three recognisable titles behind the robe. Order is deliberate: the green
+  // Milind Prashna takes the front-left slot (echoing the green of the logo)
+  // and The Buddha and his Dhamma sits behind it, where the green used to be.
   const spineTitles = [
-    "jatak-katha",
     "milind-prashna-book",
+    "the-buddha-and-his-dhamma",
     "annihilation-of-caste-marathi-translation-",
   ]
     .map((s) => bySlug.get(s))
