@@ -162,7 +162,9 @@ export default function ContactPage() {
                   <MapPin className="mt-0.5 size-4 shrink-0 text-saffron" />
                   <span>
                     <span className="block text-xs text-ink-faint">Shop</span>
-                    Nagpur, Maharashtra, India
+                    Dr. Ambedkar Road, Nagpur 440017
+                    <br />
+                    Maharashtra, India
                   </span>
                 </li>
               </ul>
@@ -187,7 +189,7 @@ export default function ContactPage() {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label="Facebook"
-                  className="flex size-10 items-center justify-center rounded-full border border-rule text-ink-soft transition hover:border-saffron hover:text-saffron-deep"
+                  className="flex size-10 items-center justify-center rounded-full bg-[#1877F2] text-white shadow-page transition hover:brightness-110"
                 >
                   <FacebookIcon className="size-4" />
                 </a>
@@ -196,7 +198,11 @@ export default function ContactPage() {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label="Instagram"
-                  className="flex size-10 items-center justify-center rounded-full border border-rule text-ink-soft transition hover:border-saffron hover:text-saffron-deep"
+                  className="flex size-10 items-center justify-center rounded-full text-white shadow-page transition hover:brightness-110"
+                  style={{
+                    background:
+                      "radial-gradient(circle at 30% 107%, #fdf497 0%, #fd5949 45%, #d6249f 60%, #285AEB 90%)",
+                  }}
                 >
                   <InstagramIcon className="size-4" />
                 </a>

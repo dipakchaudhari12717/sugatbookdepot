@@ -83,7 +83,7 @@ export default function AdminBlogPage() {
 
   async function save() {
     if (!draft.title.trim()) return setError("A title is required.");
-    if (!draft.slug.trim()) return setError("A URL slug is required.");
+    if (!draft.slug.trim()) return setError("Please give the post a title.");
     if (!draft.contentHtml.replace(/<[^>]+>/g, "").trim())
       return setError("Write some content for the post.");
 
@@ -247,19 +247,20 @@ export default function AdminBlogPage() {
                 value={draft.title}
                 onChange={(e) => {
                   const title = e.target.value;
+                  // The slug follows the title while drafting, but is frozen
+                  // once a post exists so published links never break.
                   setDraft((d) => ({ ...d, title, slug: editing ? d.slug : slugify(title) }));
                 }}
                 placeholder="What Chivar Daan means, and how to offer one"
               />
             </Field>
+            {draft.slug && (
+              <p className="-mt-2 text-[0.6875rem] text-ink-faint">
+                Web address: <code>/blog/{draft.slug}</code>
+                {editing && " — kept as it is, so existing links keep working."}
+              </p>
+            )}
           </div>
-
-          <Field label="URL slug" required hint={`/blog/${draft.slug || "…"}`}>
-            <Input
-              value={draft.slug}
-              onChange={(e) => setDraft({ ...draft, slug: slugify(e.target.value) })}
-            />
-          </Field>
 
           <Field label="Author">
             <Input

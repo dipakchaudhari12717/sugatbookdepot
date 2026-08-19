@@ -27,6 +27,13 @@
   --color-saffron-deep: #9c4f12;
   --color-saffron-wash: #fdf1e0;
 
+  /* Brand green, sampled from the Sugat logo, and the navy from the shopfront
+     banner. Used for the mark itself and brand-tinted surfaces. */
+  --color-brand: #12764a;
+  --color-brand-deep: #0d5636;
+  --color-brand-wash: #e9f4ee;
+  --color-brand-navy: #2b3990;
+
   /* Supporting */
   --color-ochre: #a8801f;
   --color-maroon: #7b2d26;
@@ -37,10 +44,17 @@
   --color-rule: rgba(36, 29, 22, 0.12);
   --color-rule-strong: rgba(36, 29, 22, 0.22);
 
-  /* Type */
-  --font-display: var(--font-fraunces), Georgia, "Times New Roman", serif;
-  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
-  --font-deva: var(--font-noto-deva), var(--font-inter), sans-serif;
+  /* Type
+     Georgia throughout — a screen-designed serif that suits a book depot and
+     needs no webfont download at all, so text paints immediately with no
+     layout shift. The fallbacks cover platforms without Georgia: Android ships
+     Noto Serif, most Linux ships Liberation Serif. */
+  --font-georgia: Georgia, "Noto Serif", "Liberation Serif", "Times New Roman",
+    serif;
+  --font-display: var(--font-georgia);
+  --font-sans: var(--font-georgia);
+  /* Georgia has no Devanagari, so Marathi/Hindi titles keep a matching serif. */
+  --font-deva: var(--font-noto-deva), var(--font-georgia);
 
   /* Motion */
   --ease-paper: cubic-bezier(0.22, 1, 0.36, 1);
@@ -91,6 +105,15 @@ body {
 ::selection {
   background: var(--color-saffron);
   color: #fff;
+}
+
+/* Georgia's figures are old-style (varying heights) by design. Classic Georgia
+   has no lining set, so this is a no-op there, but it keeps numbers aligned on
+   Georgia Pro and on the Noto/Liberation fallbacks used on Android and Linux. */
+.tabular-nums,
+table,
+input[type="number"] {
+  font-variant-numeric: lining-nums tabular-nums;
 }
 
 :focus-visible {

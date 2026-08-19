@@ -193,7 +193,8 @@ export function ProductDetail({ slug }: { slug: string }) {
       <div className="mt-7 grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:gap-16">
         {/* ---------------- Gallery ---------------- */}
         <div className="lg:sticky lg:top-28 lg:self-start">
-          <div className="book-stage">
+          <div className="flex flex-row-reverse gap-3 sm:gap-4">
+            <div className="min-w-0 flex-1 book-stage">
             <div
               className={cn(
                 "book relative aspect-4/5 w-full overflow-hidden",
@@ -230,29 +231,32 @@ export function ProductDetail({ slug }: { slug: string }) {
                 )}
               </div>
             </div>
-          </div>
-
-          {images.length > 1 && (
-            <div className="no-scrollbar mt-4 flex gap-2.5 overflow-x-auto pb-1">
-              {images.map((src, i) => (
-                <button
-                  key={src}
-                  type="button"
-                  onClick={() => setActiveImage(i)}
-                  aria-label={`View image ${i + 1}`}
-                  aria-current={i === activeImage}
-                  className={cn(
-                    "relative aspect-3/4 w-16 shrink-0 overflow-hidden rounded-md border-2 transition",
-                    i === activeImage
-                      ? "border-saffron"
-                      : "border-transparent opacity-65 hover:opacity-100",
-                  )}
-                >
-                  <Image src={src} alt="" fill sizes="64px" className="object-cover" />
-                </button>
-              ))}
             </div>
-          )}
+
+            {/* Thumbnail rail — vertical, to the left of the main image.
+                Scrolls independently when a product has many photographs. */}
+            {images.length > 1 && (
+              <div className="no-scrollbar flex max-h-[34rem] w-16 shrink-0 flex-col gap-2.5 overflow-y-auto sm:w-20">
+                {images.map((src, i) => (
+                  <button
+                    key={src}
+                    type="button"
+                    onClick={() => setActiveImage(i)}
+                    aria-label={`View image ${i + 1}`}
+                    aria-current={i === activeImage}
+                    className={cn(
+                      "relative aspect-3/4 w-full shrink-0 overflow-hidden rounded-md border-2 transition",
+                      i === activeImage
+                        ? "border-saffron"
+                        : "border-transparent opacity-65 hover:opacity-100",
+                    )}
+                  >
+                    <Image src={src} alt="" fill sizes="80px" className="object-cover" />
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
 
         {/* ---------------- Buy box ---------------- */}

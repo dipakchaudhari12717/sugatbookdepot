@@ -1,24 +1,17 @@
 import type { Metadata, Viewport } from "next";
-import { Fraunces, Inter, Noto_Serif_Devanagari } from "next/font/google";
+import { Noto_Serif_Devanagari } from "next/font/google";
 
 import "./globals.css";
 import { Providers } from "@/components/providers";
 
-/** Literary, slightly bookish display face for headings and prices. */
-const fraunces = Fraunces({
-  variable: "--font-fraunces",
-  subsets: ["latin"],
-  display: "swap",
-  axes: ["SOFT", "WONK", "opsz"],
-});
-
-const inter = Inter({
-  variable: "--font-inter",
-  subsets: ["latin"],
-  display: "swap",
-});
-
-/** Many titles in this catalog are Marathi/Hindi — they need a real face. */
+/**
+ * Latin text uses Georgia, declared in globals.css. It is a system font, so
+ * there is nothing to download and no swap flash.
+ *
+ * Devanagari is the exception: many titles in this catalogue are Marathi or
+ * Hindi and no system serif covers the script reliably, so this one face is
+ * still loaded.
+ */
 const notoDeva = Noto_Serif_Devanagari({
   variable: "--font-noto-deva",
   subsets: ["devanagari"],
@@ -79,7 +72,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     // (which would otherwise animate the jump to the top of a new page).
     <html lang="en-IN" data-scroll-behavior="smooth" suppressHydrationWarning>
       <body
-        className={`${fraunces.variable} ${inter.variable} ${notoDeva.variable} antialiased`}
+        className={`${notoDeva.variable} antialiased`}
       >
         <a
           href="#main"

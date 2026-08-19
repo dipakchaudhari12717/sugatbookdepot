@@ -21,6 +21,7 @@ import { useCart } from "@/lib/cart-context";
 import { useCatalog } from "@/lib/catalog-context";
 import type { Product } from "@/lib/types";
 import { cn, formatPrice, hasDevanagari } from "@/lib/utils";
+import { BrandLogo } from "./brand-logo";
 import { Button } from "./ui";
 
 /** Rank products against a query using the precomputed token list (FR-1.3). */
@@ -162,14 +163,7 @@ export function SiteHeader() {
             </button>
 
             {/* Wordmark */}
-            <Link href="/" className="group mr-auto flex items-baseline gap-2.5 lg:mr-8">
-              <span className="font-display text-xl leading-none font-semibold tracking-tight text-ink transition-colors group-hover:text-saffron-deep sm:text-2xl">
-                Sugat
-              </span>
-              <span className="hidden text-[0.5625rem] font-semibold uppercase leading-none tracking-[0.24em] text-saffron-deep sm:inline">
-                Book Depot
-              </span>
-            </Link>
+            <BrandLogo className="mr-auto lg:mr-8" size={scrolled ? 36 : 44} />
 
             {/* Desktop nav */}
             <nav className="hidden items-center gap-1 lg:flex">

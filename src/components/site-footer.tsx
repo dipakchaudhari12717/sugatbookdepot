@@ -5,6 +5,7 @@ import { Mail, MapPin, Phone, Send } from "lucide-react";
 import { useState } from "react";
 
 import { FacebookIcon, InstagramIcon, WhatsAppIcon } from "./brand-icons";
+import { BrandLogo } from "./brand-logo";
 
 import { useCatalog } from "@/lib/catalog-context";
 import { createEnquiry } from "@/lib/repo";
@@ -52,12 +53,7 @@ export function SiteFooter() {
         <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1.3fr]">
           {/* Brand */}
           <div>
-            <div className="flex items-baseline gap-2.5">
-              <span className="font-display text-2xl font-semibold text-ink">Sugat</span>
-              <span className="text-[0.5625rem] font-semibold uppercase tracking-[0.24em] text-saffron-deep">
-                Book Depot
-              </span>
-            </div>
+            <BrandLogo size={48} />
             <p className="mt-4 max-w-sm text-sm leading-relaxed text-ink-soft">
               Since 1967, publishing and retailing Buddhist literature and the writings of
               Dr. Babasaheb Ambedkar — fostering knowledge and enlightenment.
@@ -68,7 +64,7 @@ export function SiteFooter() {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Facebook"
-                className="flex size-9 items-center justify-center rounded-full border border-rule bg-paper-raised text-ink-soft transition hover:border-saffron hover:text-saffron-deep"
+                className="flex size-9 items-center justify-center rounded-full bg-[#1877F2] text-white shadow-page transition hover:brightness-110"
               >
                 <FacebookIcon className="size-4" />
               </a>
@@ -77,7 +73,11 @@ export function SiteFooter() {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Instagram"
-                className="flex size-9 items-center justify-center rounded-full border border-rule bg-paper-raised text-ink-soft transition hover:border-saffron hover:text-saffron-deep"
+                className="flex size-9 items-center justify-center rounded-full text-white shadow-page transition hover:brightness-110"
+                style={{
+                  background:
+                    "radial-gradient(circle at 30% 107%, #fdf497 0%, #fd5949 45%, #d6249f 60%, #285AEB 90%)",
+                }}
               >
                 <InstagramIcon className="size-4" />
               </a>
@@ -86,7 +86,7 @@ export function SiteFooter() {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="WhatsApp"
-                className="flex size-9 items-center justify-center rounded-full border border-rule bg-paper-raised text-ink-soft transition hover:border-leaf hover:text-leaf"
+                className="flex size-9 items-center justify-center rounded-full bg-[#25D366] text-white shadow-page transition hover:brightness-110"
               >
                 <WhatsAppIcon className="size-4" />
               </a>
@@ -162,7 +162,9 @@ export function SiteFooter() {
               </li>
               <li className="flex items-start gap-2.5">
                 <MapPin className="mt-0.5 size-4 shrink-0 text-ink-faint" />
-                Nagpur, Maharashtra, India
+                Dr. Ambedkar Road,
+                <br />
+                Nagpur 440017, Maharashtra
               </li>
             </ul>
 

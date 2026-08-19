@@ -153,7 +153,7 @@ export function ProductEditor({ productId }: { productId: string }) {
   function validate() {
     const next: Record<string, string> = {};
     if (!draft.title.trim()) next.title = "A title is required.";
-    if (!draft.slug.trim()) next.slug = "A URL slug is required.";
+    if (!draft.slug.trim()) next.title = "Please give the product a title.";
     if (!mrpNum || mrpNum <= 0) next.mrp = "Enter the printed price.";
     if (saleNum != null && (Number.isNaN(saleNum) || saleNum <= 0))
       next.salePrice = "Offer price must be a number above zero.";
@@ -293,11 +293,19 @@ export function ProductEditor({ productId }: { productId: string }) {
                     value={draft.title}
                     onChange={(e) => {
                       set("title", e.target.value);
+                      // Follows the title for a new product; frozen afterwards
+                      // so an existing product page never changes address.
                       if (isNew) set("slug", slugify(e.target.value));
                     }}
                     placeholder="The Buddha and his Dhamma"
                   />
                 </Field>
+                {draft.slug && (
+                  <p className="mt-1.5 text-[0.6875rem] text-ink-faint">
+                    Web address: <code>/product/{draft.slug}</code>
+                    {!isNew && " — kept as it is, so existing links keep working."}
+                  </p>
+                )}
               </div>
 
               <div className="sm:col-span-2">
@@ -309,19 +317,6 @@ export function ProductEditor({ productId }: { productId: string }) {
                   />
                 </Field>
               </div>
-
-              <Field
-                label="URL slug"
-                required
-                error={errors.slug}
-                hint={`sugatbookdepot.in/product/${draft.slug || "…"}`}
-              >
-                <Input
-                  value={draft.slug}
-                  onChange={(e) => set("slug", slugify(e.target.value))}
-                  placeholder="the-buddha-and-his-dhamma"
-                />
-              </Field>
 
               <Field label="SKU">
                 <Input value={draft.sku} onChange={(e) => set("sku", e.target.value)} placeholder="BUD-001" />
