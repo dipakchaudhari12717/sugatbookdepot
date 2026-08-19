@@ -13,6 +13,9 @@ import { cn } from "@/lib/utils";
  * or empty image. A plain <img> is used rather than next/image precisely so we
  * can detect the failure ourselves.
  */
+/** The roundel alone — square, so it stays legible at header size. */
+export const MARK_SRC = "/brand/sugat-mark.png";
+/** The full lockup, including "SINCE 1967". Needs more room. */
 export const LOGO_SRC = "/brand/sugat-logo.png";
 
 /**
@@ -40,12 +43,16 @@ export function BrandLogo({
   className,
   showWordmark = true,
   size = 40,
+  variant = "mark",
 }: {
   className?: string;
   showWordmark?: boolean;
   size?: number;
+  /** "mark" is the square roundel; "full" adds the SINCE 1967 line. */
+  variant?: "mark" | "full";
 }) {
   const { ref, broken, markBroken } = useBrokenImage();
+  const src = variant === "full" ? LOGO_SRC : MARK_SRC;
 
   return (
     <Link
@@ -57,13 +64,13 @@ export function BrandLogo({
         // eslint-disable-next-line @next/next/no-img-element
         <img
           ref={ref}
-          src={LOGO_SRC}
+          src={src}
           alt=""
           width={size}
           height={size}
           onError={markBroken}
           className="shrink-0 object-contain transition-transform duration-300 group-hover:scale-105"
-          style={{ width: size, height: size }}
+          style={{ width: size, height: variant === "full" ? "auto" : size }}
         />
       )}
 

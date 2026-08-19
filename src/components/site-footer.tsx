@@ -53,7 +53,7 @@ export function SiteFooter() {
         <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1.3fr]">
           {/* Brand */}
           <div>
-            <BrandLogo size={48} />
+            <BrandLogo size={132} variant="full" showWordmark={false} />
             <p className="mt-4 max-w-sm text-sm leading-relaxed text-ink-soft">
               Since 1967, publishing and retailing Buddhist literature and the writings of
               Dr. Babasaheb Ambedkar — fostering knowledge and enlightenment.
