@@ -2,8 +2,8 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { ExternalLink, Newspaper, Pencil, Plus, Trash2 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { ExternalLink, ImagePlus, Newspaper, Pencil, Plus, Trash2 } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 
 import { isFirebaseConfigured } from "@/lib/firebase";
 import { deleteBlogPost, estimateReadingMinutes, saveBlogPost, subscribeBlogPosts } from "@/lib/repo";
@@ -12,6 +12,7 @@ import type { BlogPost } from "@/lib/types";
 import { cn, formatDate, slugify } from "@/lib/utils";
 import { Button, Field, Input, Modal, Spinner, Textarea } from "@/components/ui";
 import { PageHeader } from "@/components/admin/admin-ui";
+import { ImageField, MediaPicker } from "@/components/admin/image-field";
 
 interface Draft {
   title: string;
@@ -46,6 +47,24 @@ export default function AdminBlogPage() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [confirmDelete, setConfirmDelete] = useState<BlogPost | null>(null);
+  const [insertOpen, setInsertOpen] = useState(false);
+  const bodyRef = useRef<HTMLTextAreaElement>(null);
+
+  /**
+   * Splice an <img> into the body at the caret, so a writer can alternate
+   * paragraphs and pictures instead of only having a cover image.
+   */
+  function insertImage(dataUri: string) {
+    const figure = `
+<figure><img src="${dataUri}" alt="" /></figure>
+`;
+    const el = bodyRef.current;
+    setDraft((d) => {
+      const at = el ? (el.selectionStart ?? d.contentHtml.length) : d.contentHtml.length;
+      return { ...d, contentHtml: d.contentHtml.slice(0, at) + figure + d.contentHtml.slice(at) };
+    });
+    setInsertOpen(false);
+  }
 
   useEffect(() => {
     if (!isFirebaseConfigured) {
@@ -270,13 +289,12 @@ export default function AdminBlogPage() {
           </Field>
 
           <div className="sm:col-span-2">
-            <Field label="Cover image URL">
-              <Input
-                value={draft.coverImage}
-                onChange={(e) => setDraft({ ...draft, coverImage: e.target.value })}
-                placeholder="https://…"
-              />
-            </Field>
+            <ImageField
+              label="Cover image"
+              value={draft.coverImage}
+              onChange={(next) => setDraft({ ...draft, coverImage: next })}
+              hint="Shown at the top of the post and on the blog index."
+            />
           </div>
 
           <div className="sm:col-span-2">
@@ -296,6 +314,7 @@ export default function AdminBlogPage() {
               hint="Basic HTML: <p> for paragraphs, <strong> for bold, <ul><li> for lists, <a href> for links."
             >
               <Textarea
+                ref={bodyRef}
                 rows={12}
                 value={draft.contentHtml}
                 onChange={(e) => setDraft({ ...draft, contentHtml: e.target.value })}
@@ -303,6 +322,15 @@ export default function AdminBlogPage() {
                 placeholder="<p>Your post…</p>"
               />
             </Field>
+            <div className="mt-2 flex flex-wrap items-center gap-2">
+              <Button variant="secondary" size="sm" onClick={() => setInsertOpen(true)}>
+                <ImagePlus className="size-3.5" /> Insert image here
+              </Button>
+              <span className="text-[0.6875rem] text-ink-faint">
+                Drops the picture in wherever the cursor is, so you can write a
+                paragraph, add a picture, then keep writing.
+              </span>
+            </div>
           </div>
 
           {draft.contentHtml.replace(/<[^>]+>/g, "").trim() && (
@@ -353,6 +381,8 @@ export default function AdminBlogPage() {
           </Button>
         </div>
       </Modal>
+
+      <MediaPicker open={insertOpen} onClose={() => setInsertOpen(false)} onPick={insertImage} />
 
       <Modal
         open={confirmDelete != null}

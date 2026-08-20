@@ -1,6 +1,6 @@
 "use client";
 
-import Image from "next/image";
+import { MediaImage } from "@/components/media-image";
 import Link from "next/link";
 import { ArrowRight, Clock, Newspaper } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
@@ -103,7 +103,7 @@ export function BlogList() {
               >
                 <div className="relative aspect-16/10 lg:aspect-auto lg:min-h-72">
                   {lead.coverImage ? (
-                    <Image
+                    <MediaImage
                       src={lead.coverImage}
                       alt=""
                       fill
@@ -155,7 +155,7 @@ export function BlogList() {
                     >
                       <div className="relative aspect-16/10 shrink-0">
                         {post.coverImage ? (
-                          <Image
+                          <MediaImage
                             src={post.coverImage}
                             alt=""
                             fill

@@ -37,6 +37,7 @@ import type {
   Category,
   Coupon,
   GalleryItem,
+  MediaItem,
   Order,
   OrderStatus,
   Product,
@@ -622,4 +623,68 @@ export async function deleteBlogPost(id: string) {
 export function estimateReadingMinutes(html: string) {
   const words = html.replace(/<[^>]+>/g, " ").trim().split(/\s+/).filter(Boolean).length;
   return Math.max(1, Math.round(words / 200));
+}
+
+/* -------------------------------------------------------------------------
+   Media library
+
+   Images are stored in Firestore because Firebase Storage is not enabled on
+   this project. See src/lib/media.ts for the size constraints that follow
+   from that.
+   ------------------------------------------------------------------------- */
+
+/** Lists the library. Only thumbnails come down, never the full-size copies. */
+export function subscribeMedia(onData: (items: MediaItem[]) => void): Unsubscribe {
+  if (!isFirebaseConfigured) {
+    onData([]);
+    return () => {};
+  }
+  return onSnapshot(
+    query(collection(getDb(), "media"), orderBy("createdAt", "desc"), fsLimit(300)),
+    (snap) => onData(snap.docs.map((d) => ({ ...(d.data() as MediaItem), id: d.id }))),
+    (err) => {
+      console.error("[repo] media subscription failed", err);
+      onData([]);
+    },
+  );
+}
+
+/**
+ * Writes the thumbnail and the full-size copy as two documents. They are not
+ * batched together on purpose: a batch caps at 10 MiB and two near-1 MiB
+ * documents plus overhead is uncomfortably close to it.
+ */
+export async function uploadMedia(input: {
+  name: string;
+  thumb: string;
+  full: string;
+  width: number;
+  height: number;
+  bytes: number;
+}): Promise<MediaItem> {
+  const db = getDb();
+  const meta: Omit<MediaItem, "id"> = {
+    name: input.name,
+    thumb: input.thumb,
+    width: input.width,
+    height: input.height,
+    bytes: input.bytes,
+    createdAt: Date.now(),
+  };
+  const ref = await addDoc(collection(db, "media"), meta);
+  await setDoc(doc(db, "mediaFull", ref.id), { data: input.full, createdAt: meta.createdAt });
+  return { ...meta, id: ref.id };
+}
+
+/** Fetches the full-size copy. Callers should cache — this is up to ~900 KB. */
+export async function getMediaFull(id: string): Promise<string | null> {
+  const snap = await getDoc(doc(getDb(), "mediaFull", id));
+  return snap.exists() ? ((snap.data().data as string) ?? null) : null;
+}
+
+export async function deleteMedia(id: string) {
+  const db = getDb();
+  await deleteDoc(doc(db, "media", id));
+  // The full-size copy may already be gone; that is not an error worth raising.
+  await deleteDoc(doc(db, "mediaFull", id)).catch(() => {});
 }

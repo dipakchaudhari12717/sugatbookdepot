@@ -1,6 +1,6 @@
 "use client";
 
-import Image from "next/image";
+import { MediaImage } from "@/components/media-image";
 import Link from "next/link";
 import { ChevronLeft, Clock, Copy, Newspaper } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
@@ -104,7 +104,7 @@ export function BlogPostView({ slug }: { slug: string }) {
       {post.coverImage && (
         <div className="mx-auto mt-9 max-w-4xl">
           <div className="relative aspect-16/9 overflow-hidden rounded-2xl border border-rule shadow-page">
-            <Image
+            <MediaImage
               src={post.coverImage}
               alt=""
               fill
@@ -150,7 +150,7 @@ export function BlogPostView({ slug }: { slug: string }) {
                 >
                   <div className="relative aspect-16/10 shrink-0">
                     {p.coverImage ? (
-                      <Image
+                      <MediaImage
                         src={p.coverImage}
                         alt=""
                         fill

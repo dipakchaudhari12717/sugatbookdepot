@@ -257,3 +257,21 @@ export const GALLERY_ALBUMS = [
   "Publications",
   "Community",
 ] as const;
+
+/**
+ * An image in the media library.
+ *
+ * `thumb` is a small data URI held inline so grids and pickers stay cheap to
+ * load. The full-size copy lives in a separate `mediaFull/{id}` document —
+ * Firestore has no partial read, so keeping them together would mean every
+ * picker download the whole library at full size.
+ */
+export interface MediaItem {
+  id: string;
+  name: string;
+  thumb: string;
+  width: number;
+  height: number;
+  bytes: number;
+  createdAt: number;
+}

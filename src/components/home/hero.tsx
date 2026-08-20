@@ -7,6 +7,7 @@ import { ArrowRight, BookOpen, ShieldCheck, Truck } from "lucide-react";
 import { useCatalog } from "@/lib/catalog-context";
 import { cn, formatPrice } from "@/lib/utils";
 import { LinkButton } from "@/components/ui";
+import { TopBanner } from "@/components/top-banner";
 
 /**
  * Homepage hero (SRS §5): light and calm rather than the legacy dark banner,
@@ -51,9 +52,16 @@ export function Hero() {
         <div className="grid items-center gap-12 py-14 lg:grid-cols-[1.05fr_1fr] lg:gap-16 lg:py-20">
           {/* ---------------- Copy ---------------- */}
           <div className="max-w-xl">
+            {/* The shopfront sign, sitting above the headline rather than above
+                the navigation — it reads as a letterhead for the page instead
+                of a second header bar. */}
+            <div style={{ animation: "rise 0.6s var(--ease-paper) both" }}>
+              <TopBanner />
+            </div>
+
             <p
-              className="eyebrow flex items-center gap-2"
-              style={{ animation: "rise 0.6s var(--ease-paper) both" }}
+              className="eyebrow mt-6 flex items-center gap-2"
+              style={{ animation: "rise 0.6s var(--ease-paper) 0.04s both" }}
             >
               <span className="h-px w-6 bg-saffron" />
               Established 1967

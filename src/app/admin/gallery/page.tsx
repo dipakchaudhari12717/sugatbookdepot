@@ -10,6 +10,7 @@ import { useToast } from "@/lib/toast-context";
 import { GALLERY_ALBUMS, type GalleryItem } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { Button, Field, Input, Modal, Select, Spinner, Textarea } from "@/components/ui";
+import { ImageField } from "@/components/admin/image-field";
 import { PageHeader } from "@/components/admin/admin-ui";
 
 interface Draft {
@@ -80,8 +81,7 @@ export default function AdminGalleryPage() {
 
   async function save() {
     if (!draft.title.trim()) return setError("Give the photograph a short title.");
-    if (!/^https?:\/\//i.test(draft.image.trim()))
-      return setError("Paste an image link starting with https://");
+    if (!draft.image.trim()) return setError("Please choose a photograph.");
 
     setBusy(true);
     try {
@@ -233,23 +233,13 @@ export default function AdminGalleryPage() {
       >
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="sm:col-span-2">
-            <Field label="Image URL" required hint="Firebase Storage needs a paid plan, so photographs are linked rather than uploaded. Any public image link works.">
-              <Input
-                value={draft.image}
-                onChange={(e) => setDraft({ ...draft, image: e.target.value })}
-                placeholder="https://…"
-              />
-            </Field>
+            <ImageField
+              label="Photograph"
+              value={draft.image}
+              onChange={(next) => setDraft({ ...draft, image: next })}
+              aspect="aspect-4/3"
+            />
           </div>
-
-          {/^https?:\/\//i.test(draft.image) && (
-            <div className="sm:col-span-2">
-              <div className="relative aspect-16/9 overflow-hidden rounded-xl border border-rule bg-paper-sunk">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={draft.image} alt="Preview" className="size-full object-contain" />
-              </div>
-            </div>
-          )}
 
           <div className="sm:col-span-2">
             <Field label="Title" required>

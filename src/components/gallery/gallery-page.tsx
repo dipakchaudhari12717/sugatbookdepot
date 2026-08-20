@@ -1,6 +1,6 @@
 "use client";
 
-import Image from "next/image";
+import { MediaImage } from "@/components/media-image";
 import { ChevronLeft, ChevronRight, ImageIcon, X } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
@@ -134,7 +134,7 @@ export function GalleryPage() {
                   className="group block w-full break-inside-avoid overflow-hidden rounded-xl border border-rule bg-paper-raised text-left shadow-page transition-all duration-400 ease-[var(--ease-paper)] hover:-translate-y-1 hover:shadow-lift"
                 >
                   <div className="relative w-full overflow-hidden">
-                    <Image
+                    <MediaImage
                       src={item.image}
                       alt={item.title}
                       width={600}
@@ -219,7 +219,7 @@ export function GalleryPage() {
             className="relative z-1 flex max-h-full w-full max-w-4xl flex-col items-center"
             style={{ animation: "rise 0.3s var(--ease-paper)" }}
           >
-            <Image
+            <MediaImage
               key={active.image}
               src={active.image}
               alt={active.title}

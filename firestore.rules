@@ -141,6 +141,21 @@ service cloud.firestore {
       allow create, update, delete: if isAdmin();
     }
 
+    // --- Media library ----------------------------------------------------
+    // Uploaded images live here because Firebase Storage is not enabled on
+    // this project. `media` holds thumbnails and metadata; `mediaFull` holds
+    // the full-size copy of each, split so that listing the library does not
+    // pull down every image at full size.
+    match /media/{itemId} {
+      allow read: if true;
+      allow create, update, delete: if isAdmin();
+    }
+
+    match /mediaFull/{itemId} {
+      allow read: if true;
+      allow create, update, delete: if isAdmin();
+    }
+
     // --- Newsletter / bulk enquiries -------------------------------------
     match /enquiries/{enquiryId} {
       allow create: if true;

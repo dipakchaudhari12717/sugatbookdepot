@@ -6,8 +6,7 @@ import { useCatalog } from "@/lib/catalog-context";
 import { BrandBanner } from "./brand-logo";
 
 /**
- * The shopfront banner, sitting above everything else — placement P1, chosen by
- * the shop.
+ * The shopfront banner, sitting at the top of the home page hero.
  *
  * Which language shows is a shop setting, so it can be switched from
  * Admin → Settings without a code change.
@@ -25,11 +24,11 @@ export function TopBanner() {
   if (lang === "off") return null;
 
   return (
-    <div className="border-b border-rule bg-white">
+    <div className="inline-block">
       <Link
         href="/"
         aria-label="Sugat Book Depot — Buddhist Literature, Dr. Ambedkar Road, Nagpur"
-        className="mx-auto flex justify-center px-3 py-2 sm:py-2.5"
+        className="block overflow-hidden rounded-xl border border-rule bg-white p-2 shadow-page transition-shadow hover:shadow-lift"
       >
         {/* On a phone the sign is capped by width, so the shop name, phone and
             address stay readable. On wider screens it is capped by height
@@ -37,7 +36,7 @@ export function TopBanner() {
         <BrandBanner
           lang={lang}
           priority
-          className="h-auto w-full max-w-sm sm:h-14 sm:w-auto sm:max-w-full lg:h-16"
+          className="h-auto w-full max-w-xs sm:max-w-sm"
         />
       </Link>
     </div>
