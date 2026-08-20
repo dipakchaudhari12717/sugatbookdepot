@@ -7,7 +7,7 @@ import { isFirebaseConfigured } from "@/lib/firebase";
 import { saveSettings } from "@/lib/repo";
 import { useToast } from "@/lib/toast-context";
 import type { StoreSettings } from "@/lib/types";
-import { Button, Card, Field, Input, Textarea } from "@/components/ui";
+import { Button, Card, Field, Input, Select, Textarea } from "@/components/ui";
 import { PageHeader } from "@/components/admin/admin-ui";
 
 export default function AdminSettingsPage() {
@@ -172,6 +172,28 @@ export default function AdminSettingsPage() {
               />
             </Field>
           </div>
+        </Card>
+
+        {/* Shopfront banner */}
+        <Card className="p-6">
+          <h2 className="mb-1.5 font-display text-lg font-semibold text-ink">Shopfront banner</h2>
+          <p className="mb-5 text-xs text-ink-faint">
+            The blue sign shown across the very top of every page.
+          </p>
+          <Field label="Which version to show">
+            <Select
+              value={draft.bannerLang ?? "mr"}
+              onChange={(e) => set("bannerLang", e.target.value as "mr" | "en" | "off")}
+            >
+              <option value="mr">Marathi</option>
+              <option value="en">English</option>
+              <option value="off">Hide the banner</option>
+            </Select>
+          </Field>
+          <p className="mt-3 rounded-xl bg-paper-sunk px-4 py-3 text-xs leading-relaxed text-ink-soft">
+            Both language versions are already loaded, so switching takes effect
+            immediately — nothing needs to be re-uploaded.
+          </p>
         </Card>
 
         {/* Announcement */}

@@ -53,6 +53,7 @@ const DEFAULT_SETTINGS = {
   upiEnabled: true,
   upiId: "sugatbookdepot@upi",
   announcement: "Free delivery across India on orders above ₹499",
+  bannerLang: "mr",
   whatsappNumber: "917709001950",
   contactEmail: "sugat4books@gmail.com",
   contactPhone: "+91 90283 60464",

@@ -207,6 +207,8 @@ export interface StoreSettings {
   upiEnabled: boolean;
   upiId: string;
   announcement: string;
+  /** Which shopfront banner sits at the very top: Marathi, English, or none. */
+  bannerLang: "mr" | "en" | "off";
   whatsappNumber: string;
   contactEmail: string;
   contactPhone: string;

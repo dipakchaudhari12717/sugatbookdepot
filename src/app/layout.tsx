@@ -1,16 +1,24 @@
 import type { Metadata, Viewport } from "next";
-import { Noto_Serif_Devanagari } from "next/font/google";
+import { Noto_Serif_Devanagari, Source_Serif_4 } from "next/font/google";
 
 import "./globals.css";
 import { Providers } from "@/components/providers";
 
 /**
- * Latin text uses Georgia, declared in globals.css. It is a system font, so
- * there is nothing to download and no swap flash.
- *
- * Devanagari is the exception: many titles in this catalogue are Marathi or
- * Hindi and no system serif covers the script reliably, so this one face is
- * still loaded.
+ * Source Serif 4 carries the Latin text — the face the shop picked from the
+ * type specimen. Loading it through next/font means it is self-hosted and
+ * preloaded, with Georgia as the fallback in globals.css so the swap is barely
+ * visible.
+ */
+const sourceSerif = Source_Serif_4({
+  variable: "--font-source-serif",
+  subsets: ["latin"],
+  display: "swap",
+});
+
+/**
+ * Devanagari needs its own face: many titles in this catalogue are Marathi or
+ * Hindi and no Latin serif covers the script.
  */
 const notoDeva = Noto_Serif_Devanagari({
   variable: "--font-noto-deva",
@@ -70,10 +78,19 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     // `data-scroll-behavior` tells Next that the smooth scrolling in globals.css
     // is intentional, so it suppresses smooth-scroll during route transitions
     // (which would otherwise animate the jump to the top of a new page).
-    <html lang="en-IN" data-scroll-behavior="smooth" suppressHydrationWarning>
-      <body
-        className={`${notoDeva.variable} antialiased`}
-      >
+    // The font variables must sit on <html>, not <body>. `--font-display` and
+    // friends are declared at :root in globals.css, so if the face variable
+    // they reference is only defined further down the tree, the var() has
+    // nothing to resolve against, the whole font-family computes as invalid,
+    // and every element inherits that — the page silently falls back to the
+    // system sans.
+    <html
+      lang="en-IN"
+      data-scroll-behavior="smooth"
+      className={`${sourceSerif.variable} ${notoDeva.variable}`}
+      suppressHydrationWarning
+    >
+      <body className="antialiased">
         <a
           href="#main"
           className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[200] focus:rounded-full focus:bg-saffron focus:px-4 focus:py-2 focus:text-sm focus:text-white"

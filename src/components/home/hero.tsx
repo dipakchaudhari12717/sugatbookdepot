@@ -56,25 +56,24 @@ export function Hero() {
               style={{ animation: "rise 0.6s var(--ease-paper) both" }}
             >
               <span className="h-px w-6 bg-saffron" />
-              Established 1967 · Nagpur
+              Established 1967
             </p>
 
             <h1
               className="mt-5 font-display text-[2.6rem] leading-[1.06] font-semibold tracking-tight text-ink sm:text-6xl"
               style={{ animation: "rise 0.7s var(--ease-paper) 0.06s both" }}
             >
-              The Dhamma,
+              Nagpur&apos;s Buddhist
               <br />
-              <span className="text-saffron-deep">in your language.</span>
+              <span className="text-saffron-deep">bookshop since 1967.</span>
             </h1>
 
             <p
               className="mt-6 max-w-lg text-base leading-relaxed text-ink-soft"
               style={{ animation: "rise 0.7s var(--ease-paper) 0.14s both" }}
             >
-              Since 1967, publishing and retailing Buddhist literature and the writings of
-              Dr. Babasaheb Ambedkar — alongside Chivar for the Sangha, hand-finished Buddha
-              statues, and everyday stationery.
+              Buddhist literature, Dr. Babasaheb Ambedkar&apos;s writings, Chivar for the
+              Sangha, Buddha statues and stationery — delivered anywhere in India.
             </p>
 
             <div

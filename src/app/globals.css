@@ -45,16 +45,21 @@
   --color-rule-strong: rgba(36, 29, 22, 0.22);
 
   /* Type
-     Georgia throughout — a screen-designed serif that suits a book depot and
-     needs no webfont download at all, so text paints immediately with no
-     layout shift. The fallbacks cover platforms without Georgia: Android ships
-     Noto Serif, most Linux ships Liberation Serif. */
-  --font-georgia: Georgia, "Noto Serif", "Liberation Serif", "Times New Roman",
-    serif;
-  --font-display: var(--font-georgia);
-  --font-sans: var(--font-georgia);
-  /* Georgia has no Devanagari, so Marathi/Hindi titles keep a matching serif. */
-  --font-deva: var(--font-noto-deva), var(--font-georgia);
+     Source Serif 4 throughout — chosen by the shop from the type specimen.
+     A modern reading serif: cleaner than Georgia, still unmistakably a book
+     face. Georgia stays as the first fallback so the page looks close to
+     correct in the moment before the webfont lands.
+
+     The stack is written out in full for each role rather than shared through
+     one intermediate variable: Tailwind drops theme variables it cannot see
+     referenced by a utility, and an unemitted variable silently empties every
+     font-family that depends on it. */
+  --font-display: var(--font-source-serif), Georgia, "Noto Serif",
+    "Liberation Serif", "Times New Roman", serif;
+  --font-sans: var(--font-source-serif), Georgia, "Noto Serif",
+    "Liberation Serif", "Times New Roman", serif;
+  /* Latin faces carry no Devanagari, so Marathi/Hindi keep a matching serif. */
+  --font-deva: var(--font-noto-deva), var(--font-source-serif), Georgia, serif;
 
   /* Motion */
   --ease-paper: cubic-bezier(0.22, 1, 0.36, 1);
@@ -107,9 +112,7 @@ body {
   color: #fff;
 }
 
-/* Georgia's figures are old-style (varying heights) by design. Classic Georgia
-   has no lining set, so this is a no-op there, but it keeps numbers aligned on
-   Georgia Pro and on the Noto/Liberation fallbacks used on Android and Linux. */
+/* Keep digits aligned wherever they sit in a column. */
 .tabular-nums,
 table,
 input[type="number"] {
