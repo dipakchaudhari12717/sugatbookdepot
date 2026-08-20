@@ -1,6 +1,6 @@
 "use client";
 
-import Image from "next/image";
+import { MediaImage } from "@/components/media-image";
 import Link from "next/link";
 import { doc, onSnapshot } from "firebase/firestore";
 import { ChevronLeft, Copy, MapPin, Printer, Truck, User } from "lucide-react";
@@ -215,7 +215,7 @@ export function AdminOrderDetail({ orderId }: { orderId: string }) {
                 <li key={line.lineId} className="flex gap-4 py-4 first:pt-0 last:pb-0">
                   <div className="relative h-20 w-14 shrink-0 overflow-hidden rounded-sm bg-paper-sunk shadow-page">
                     {line.image && (
-                      <Image src={line.image} alt="" fill sizes="56px" className="object-cover" />
+                      <MediaImage src={line.image} alt="" fill sizes="56px" className="object-cover" />
                     )}
                   </div>
                   <div className="min-w-0 flex-1">

@@ -1,6 +1,6 @@
 "use client";
 
-import Image from "next/image";
+import { MediaImage } from "@/components/media-image";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { doc, onSnapshot } from "firebase/firestore";
@@ -169,7 +169,7 @@ export function OrderDetail({ orderId }: { orderId: string }) {
                     className="relative h-20 w-14 shrink-0 overflow-hidden rounded-sm bg-paper-sunk shadow-page"
                   >
                     {line.image && (
-                      <Image src={line.image} alt="" fill sizes="56px" className="object-cover" />
+                      <MediaImage src={line.image} alt="" fill sizes="56px" className="object-cover" />
                     )}
                   </Link>
                   <div className="min-w-0 flex-1">

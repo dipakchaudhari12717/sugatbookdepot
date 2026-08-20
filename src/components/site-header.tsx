@@ -1,6 +1,6 @@
 "use client";
 
-import Image from "next/image";
+import { MediaImage } from "@/components/media-image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
@@ -344,7 +344,7 @@ export function SiteHeader() {
                   >
                     <div className="relative h-16 w-12 shrink-0 overflow-hidden rounded-sm bg-paper-sunk shadow-page">
                       {p.image && (
-                        <Image src={p.image} alt="" fill sizes="48px" className="object-cover" />
+                        <MediaImage src={p.image} alt="" fill sizes="48px" className="object-cover" />
                       )}
                     </div>
                     <div className="min-w-0 flex-1">

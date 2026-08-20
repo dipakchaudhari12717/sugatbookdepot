@@ -1,6 +1,6 @@
 "use client";
 
-import Image from "next/image";
+import { MediaImage } from "@/components/media-image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import {
@@ -202,7 +202,7 @@ export function ProductDetail({ slug }: { slug: string }) {
               )}
             >
               {images[activeImage] ? (
-                <Image
+                <MediaImage
                   key={images[activeImage]}
                   src={images[activeImage]}
                   alt={`${product.title} — image ${activeImage + 1}`}
@@ -251,7 +251,7 @@ export function ProductDetail({ slug }: { slug: string }) {
                         : "border-transparent opacity-65 hover:opacity-100",
                     )}
                   >
-                    <Image src={src} alt="" fill sizes="80px" className="object-cover" />
+                    <MediaImage src={src} alt="" fill sizes="80px" className="object-cover" />
                   </button>
                 ))}
               </div>

@@ -1,6 +1,6 @@
 "use client";
 
-import Image from "next/image";
+import { MediaImage } from "@/components/media-image";
 import Link from "next/link";
 import { Minus, Plus, ShoppingBag, Tag, Trash2, Truck, X } from "lucide-react";
 import { useState } from "react";
@@ -104,7 +104,7 @@ export function CartPage() {
                 className="relative h-28 w-20 shrink-0 overflow-hidden rounded-sm bg-paper-sunk shadow-page sm:h-32 sm:w-24"
               >
                 {line.image && (
-                  <Image src={line.image} alt="" fill sizes="96px" className="object-cover" />
+                  <MediaImage src={line.image} alt="" fill sizes="96px" className="object-cover" />
                 )}
               </Link>
 

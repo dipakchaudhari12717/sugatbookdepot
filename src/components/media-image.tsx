@@ -20,6 +20,7 @@ export function MediaImage({
   height,
   fill,
   priority,
+  style,
 }: {
   src: string;
   alt: string;
@@ -29,6 +30,7 @@ export function MediaImage({
   height?: number;
   fill?: boolean;
   priority?: boolean;
+  style?: React.CSSProperties;
 }) {
   if (isInlineImage(src)) {
     return (
@@ -40,13 +42,27 @@ export function MediaImage({
         loading={priority ? "eager" : "lazy"}
         // `fill` positions against the nearest positioned ancestor, matching
         // what next/image does, so callers can swap between the two freely.
-        style={fill ? { position: "absolute", inset: 0, width: "100%", height: "100%" } : undefined}
+        style={
+          fill
+            ? { position: "absolute", inset: 0, width: "100%", height: "100%", ...style }
+            : style
+        }
       />
     );
   }
 
   if (fill) {
-    return <Image src={src} alt={alt} fill sizes={sizes} className={className} priority={priority} />;
+    return (
+      <Image
+        src={src}
+        alt={alt}
+        fill
+        sizes={sizes}
+        className={className}
+        priority={priority}
+        style={style}
+      />
+    );
   }
 
   return (
@@ -58,6 +74,7 @@ export function MediaImage({
       sizes={sizes}
       className={className}
       priority={priority}
+      style={style}
     />
   );
 }

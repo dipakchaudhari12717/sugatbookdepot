@@ -1,6 +1,6 @@
 "use client";
 
-import Image from "next/image";
+import { MediaImage } from "@/components/media-image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Banknote, Check, ChevronLeft, Lock, Smartphone, Truck } from "lucide-react";
@@ -494,7 +494,7 @@ export function CheckoutPage() {
                 <li key={line.lineId} className="flex gap-3">
                   <div className="relative h-16 w-12 shrink-0 overflow-hidden rounded-sm bg-paper-sunk">
                     {line.image && (
-                      <Image src={line.image} alt="" fill sizes="48px" className="object-cover" />
+                      <MediaImage src={line.image} alt="" fill sizes="48px" className="object-cover" />
                     )}
                     <span className="absolute -right-1 -top-1 flex size-4.5 items-center justify-center rounded-full bg-ink text-[0.5625rem] font-bold text-paper">
                       {line.quantity}

@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ChevronLeft, GripVertical, ImageOff, Plus, Trash2, X } from "lucide-react";
@@ -13,6 +12,8 @@ import type { Product, ProductOption } from "@/lib/types";
 import { cn, formatPrice, slugify } from "@/lib/utils";
 import { Button, Card, Field, Input, Select, Spinner, Textarea } from "@/components/ui";
 import { PageHeader } from "./admin-ui";
+import { MediaPicker } from "./image-field";
+import { MediaImage } from "@/components/media-image";
 
 /** Everything the form edits. Kept separate from `Product` so drafts can be partial. */
 interface Draft {
@@ -104,7 +105,7 @@ export function ProductEditor({ productId }: { productId: string }) {
   const [hydrated, setHydrated] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [saving, setSaving] = useState(false);
-  const [imageInput, setImageInput] = useState("");
+  const [pickerOpen, setPickerOpen] = useState(false);
 
   useEffect(() => {
     if (isNew) {
@@ -159,7 +160,7 @@ export function ProductEditor({ productId }: { productId: string }) {
       next.salePrice = "Offer price must be a number above zero.";
     if (saleNum != null && saleNum >= mrpNum)
       next.salePrice = "Offer price must be below the printed price.";
-    if (!draft.images.length) next.images = "Add at least one image URL.";
+    if (!draft.images.length) next.images = "Add at least one image.";
     setErrors(next);
     return Object.keys(next).length === 0;
   }
@@ -217,15 +218,9 @@ export function ProductEditor({ productId }: { productId: string }) {
     }
   }
 
-  function addImage() {
-    const url = imageInput.trim();
-    if (!url) return;
-    if (!/^https?:\/\//i.test(url)) {
-      toast("Image links must start with https://", "error");
-      return;
-    }
-    set("images", [...draft.images, url]);
-    setImageInput("");
+  function addImage(src: string) {
+    set("images", [...draft.images, src]);
+    setPickerOpen(false);
   }
 
   if (!isNew && loading && !existing) {
@@ -373,27 +368,14 @@ export function ProductEditor({ productId }: { productId: string }) {
           <Card className="p-6">
             <h2 className="mb-1.5 font-display text-lg font-semibold text-ink">Images</h2>
             <p className="mb-4 text-xs text-ink-faint">
-              Paste image links (https://). The first image is used as the cover. Firebase Storage
-              needs a paid plan, so images are linked rather than uploaded — any public image host
-              works.
+              Upload photographs from your device, or reuse one already in the
+              library. The first image is the cover — drag it to the front with
+              the arrow if you want a different one.
             </p>
 
-            <div className="flex gap-2">
-              <Input
-                value={imageInput}
-                onChange={(e) => setImageInput(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") {
-                    e.preventDefault();
-                    addImage();
-                  }
-                }}
-                placeholder="https://…"
-              />
-              <Button variant="secondary" onClick={addImage}>
-                <Plus className="size-4" /> Add
-              </Button>
-            </div>
+            <Button variant="secondary" onClick={() => setPickerOpen(true)}>
+              <Plus className="size-4" /> Add image
+            </Button>
             {errors.images && <p className="mt-2 text-xs text-maroon">{errors.images}</p>}
 
             {draft.images.length > 0 && (
@@ -401,14 +383,7 @@ export function ProductEditor({ productId }: { productId: string }) {
                 {draft.images.map((src, i) => (
                   <li key={`${src}-${i}`} className="group relative">
                     <div className="relative aspect-3/4 overflow-hidden rounded-lg border border-rule bg-paper-sunk">
-                      <Image
-                        src={src}
-                        alt=""
-                        fill
-                        sizes="120px"
-                        className="object-cover"
-                        unoptimized
-                      />
+                      <MediaImage src={src} alt="" fill sizes="120px" className="object-cover" />
                       {i === 0 && (
                         <span className="absolute left-1.5 top-1.5 rounded-full bg-ink/85 px-2 py-0.5 text-[0.5625rem] font-semibold uppercase tracking-wide text-paper">
                           Cover
@@ -677,6 +652,8 @@ export function ProductEditor({ productId }: { productId: string }) {
           </Button>
         </div>
       </div>
+
+      <MediaPicker open={pickerOpen} onClose={() => setPickerOpen(false)} onPick={addImage} />
     </div>
   );
 }

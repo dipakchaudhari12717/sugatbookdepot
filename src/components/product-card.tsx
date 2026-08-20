@@ -1,6 +1,6 @@
 "use client";
 
-import Image from "next/image";
+import { MediaImage } from "@/components/media-image";
 import Link from "next/link";
 import { Heart, ShoppingBag } from "lucide-react";
 import { useState } from "react";
@@ -63,7 +63,7 @@ export function ProductCard({
           )}
         >
           {product.image ? (
-            <Image
+            <MediaImage
               src={product.image}
               alt={product.title}
               fill

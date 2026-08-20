@@ -1,6 +1,6 @@
 "use client";
 
-import Image from "next/image";
+import { MediaImage } from "@/components/media-image";
 import Link from "next/link";
 import { ArrowRight, BookMarked, Handshake, Package, Sparkles } from "lucide-react";
 import { useMemo } from "react";
@@ -67,7 +67,7 @@ export function HomePage() {
               className="group relative flex flex-col justify-center overflow-hidden rounded-3xl border border-rule bg-gradient-to-br from-saffron-wash via-paper-raised to-paper-sunk px-7 py-10 shadow-page sm:px-12 sm:py-14"
             >
               {activeBanner.image && (
-                <Image
+                <MediaImage
                   src={activeBanner.image}
                   alt=""
                   fill
@@ -149,7 +149,7 @@ export function HomePage() {
                             transitionDelay: `${idx * 55}ms`,
                           }}
                         >
-                          <Image src={p.image} alt="" fill sizes="44px" className="object-cover" />
+                          <MediaImage src={p.image} alt="" fill sizes="44px" className="object-cover" />
                         </div>
                       ) : null,
                     )}
@@ -170,7 +170,7 @@ export function HomePage() {
               <div className="grid gap-0 lg:grid-cols-2">
                 <div className="relative min-h-72 lg:min-h-[26rem]">
                   {chivar.image && (
-                    <Image
+                    <MediaImage
                       src={chivar.image}
                       alt={chivar.title}
                       fill

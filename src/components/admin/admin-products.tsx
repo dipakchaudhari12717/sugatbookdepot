@@ -1,6 +1,6 @@
 "use client";
 
-import Image from "next/image";
+import { MediaImage } from "@/components/media-image";
 import Link from "next/link";
 import { Eye, Pencil, Plus, Search, Trash2 } from "lucide-react";
 import { useMemo, useState } from "react";
@@ -141,7 +141,7 @@ export function AdminProducts() {
                 <Td>
                   <div className="flex items-center gap-3">
                     <div className="relative h-14 w-10 shrink-0 overflow-hidden rounded-sm bg-paper-sunk shadow-page">
-                      {p.image && <Image src={p.image} alt="" fill sizes="40px" className="object-cover" />}
+                      {p.image && <MediaImage src={p.image} alt="" fill sizes="40px" className="object-cover" />}
                     </div>
                     <div className="min-w-0">
                       <Link

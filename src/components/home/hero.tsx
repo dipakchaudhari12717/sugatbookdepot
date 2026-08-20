@@ -1,6 +1,6 @@
 "use client";
 
-import Image from "next/image";
+import { MediaImage } from "@/components/media-image";
 import Link from "next/link";
 import { ArrowRight, BookOpen, ShieldCheck, Truck } from "lucide-react";
 
@@ -148,7 +148,7 @@ export function Hero() {
                     }}
                   >
                     <div className="relative aspect-3/4 w-full">
-                      <Image
+                      <MediaImage
                         src={book.image}
                         alt={book.title}
                         fill
@@ -176,7 +176,7 @@ export function Hero() {
                   aria-label={chivar.title}
                 >
                   <div className="relative aspect-4/5 w-full overflow-hidden rounded-xl border border-white/50 shadow-[0_8px_18px_rgba(36,29,22,0.16),0_28px_56px_rgba(36,29,22,0.2)]">
-                    <Image
+                    <MediaImage
                       src={chivar.image}
                       alt={chivar.title}
                       fill

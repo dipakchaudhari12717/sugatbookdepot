@@ -1,6 +1,6 @@
 "use client";
 
-import Image from "next/image";
+import { MediaImage } from "@/components/media-image";
 import Link from "next/link";
 import {
   AlertTriangle,
@@ -275,7 +275,7 @@ export function AdminDashboard() {
                     </span>
                     <div className="relative h-12 w-9 shrink-0 overflow-hidden rounded-sm bg-paper-sunk">
                       {product?.image && (
-                        <Image src={product.image} alt="" fill sizes="36px" className="object-cover" />
+                        <MediaImage src={product.image} alt="" fill sizes="36px" className="object-cover" />
                       )}
                     </div>
                     <div className="min-w-0 flex-1">
@@ -304,7 +304,7 @@ export function AdminDashboard() {
               {lowStock.map((p) => (
                 <li key={p.id} className="flex items-center gap-3 px-4 py-3">
                   <div className="relative h-11 w-8 shrink-0 overflow-hidden rounded-sm bg-paper-sunk">
-                    {p.image && <Image src={p.image} alt="" fill sizes="32px" className="object-cover" />}
+                    {p.image && <MediaImage src={p.image} alt="" fill sizes="32px" className="object-cover" />}
                   </div>
                   <Link
                     href={`/admin/products/${p.id}`}

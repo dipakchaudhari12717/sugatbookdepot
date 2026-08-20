@@ -1,6 +1,6 @@
 "use client";
 
-import Image from "next/image";
+import { MediaImage } from "@/components/media-image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ChevronRight, Package, Search } from "lucide-react";
@@ -114,7 +114,7 @@ export function OrdersPage() {
                               className="relative h-14 w-10 shrink-0 overflow-hidden rounded-sm border-2 border-paper-raised bg-paper-sunk shadow-page"
                             >
                               {line.image && (
-                                <Image src={line.image} alt="" fill sizes="40px" className="object-cover" />
+                                <MediaImage src={line.image} alt="" fill sizes="40px" className="object-cover" />
                               )}
                             </div>
                           ))}
