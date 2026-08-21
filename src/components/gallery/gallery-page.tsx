@@ -1,7 +1,7 @@
 "use client";
 
 import { MediaImage } from "@/components/media-image";
-import { ChevronLeft, ChevronRight, ImageIcon, X } from "lucide-react";
+import { ChevronLeft, ChevronRight, ImageIcon, Play, X } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { subscribeGallery } from "@/lib/repo";
@@ -75,8 +75,8 @@ export function GalleryPage() {
         Moments from the depot
       </h1>
       <p className="mt-5 max-w-2xl text-[0.9375rem] leading-relaxed text-ink-soft">
-        The shop counter in Nagpur, Chivar Daan offerings at Varshavas and Kathina, book launches,
-        and the readers and viharas we have served since 1967.
+        Photographs and videos — the shop counter in Nagpur, Chivar Daan offerings at Varshavas and
+        Kathina, book launches, and the readers and viharas we have served since 1967.
       </p>
 
       {albums.length > 0 && (
@@ -119,8 +119,8 @@ export function GalleryPage() {
         ) : visible.length === 0 ? (
           <EmptyState
             icon={<ImageIcon className="size-6" />}
-            title="No photographs yet"
-            description="Pictures from the shop and from Chivar Daan events will appear here once they are added."
+            title="Nothing here yet"
+            description="Photographs and videos from the shop and from Chivar Daan events will appear here once they are added."
           />
         ) : (
           /* Masonry via CSS columns, so portrait and landscape shots keep their
@@ -150,6 +150,17 @@ export function GalleryPage() {
                           "linear-gradient(to top, rgba(36,29,22,0.5) 0%, transparent 55%)",
                       }}
                     />
+
+                    {item.kind === "video" && (
+                      <span
+                        aria-hidden
+                        className="absolute inset-0 grid place-items-center"
+                      >
+                        <span className="flex size-12 items-center justify-center rounded-full bg-ink/70 text-white shadow-lift backdrop-blur-sm transition-transform duration-300 group-hover:scale-110">
+                          <Play className="ml-0.5 size-5 fill-current" />
+                        </span>
+                      </span>
+                    )}
                   </div>
                   {(item.title || item.album) && (
                     <div className="p-3.5">
@@ -219,15 +230,30 @@ export function GalleryPage() {
             className="relative z-1 flex max-h-full w-full max-w-4xl flex-col items-center"
             style={{ animation: "rise 0.3s var(--ease-paper)" }}
           >
-            <MediaImage
-              key={active.image}
-              src={active.image}
-              alt={active.title}
-              width={1400}
-              height={1000}
-              sizes="100vw"
-              className="max-h-[74vh] w-auto rounded-xl object-contain shadow-lift"
-            />
+            {active.kind === "video" && active.youtubeId ? (
+              <div className="w-full max-w-4xl">
+                <div className="relative aspect-video w-full overflow-hidden rounded-xl shadow-lift">
+                  <iframe
+                    key={active.youtubeId}
+                    src={`https://www.youtube-nocookie.com/embed/${active.youtubeId}?rel=0&autoplay=1`}
+                    title={active.title}
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                    allowFullScreen
+                    className="absolute inset-0 size-full border-0"
+                  />
+                </div>
+              </div>
+            ) : (
+              <MediaImage
+                key={active.image}
+                src={active.image}
+                alt={active.title}
+                width={1400}
+                height={1000}
+                sizes="100vw"
+                className="max-h-[74vh] w-auto rounded-xl object-contain shadow-lift"
+              />
+            )}
             <figcaption className="mt-4 max-w-2xl text-center">
               <p className="font-display text-lg font-semibold text-white">{active.title}</p>
               {active.description && (

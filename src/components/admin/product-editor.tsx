@@ -18,6 +18,7 @@ import { MediaImage } from "@/components/media-image";
 /** Everything the form edits. Kept separate from `Product` so drafts can be partial. */
 interface Draft {
   title: string;
+  titleMr: string;
   slug: string;
   sku: string;
   subtitle: string;
@@ -43,6 +44,7 @@ interface Draft {
 
 const EMPTY: Draft = {
   title: "",
+  titleMr: "",
   slug: "",
   sku: "",
   subtitle: "",
@@ -69,6 +71,7 @@ const EMPTY: Draft = {
 function toDraft(p: Product): Draft {
   return {
     title: p.title,
+    titleMr: p.titleMr ?? "",
     slug: p.slug,
     sku: p.sku ?? "",
     subtitle: p.subtitle ?? "",
@@ -126,6 +129,7 @@ export function ProductEditor({ productId }: { productId: string }) {
   const searchTokens = useMemo(() => {
     const source = [
       draft.title,
+      draft.titleMr,
       draft.subtitle,
       draft.author,
       draft.language,
@@ -175,6 +179,7 @@ export function ProductEditor({ productId }: { productId: string }) {
       const stock = Math.max(0, Number(draft.stock) || 0);
       const payload: Partial<Product> = {
         title: draft.title.trim(),
+        titleMr: draft.titleMr.trim() || null,
         slug: draft.slug.trim(),
         sku: draft.sku.trim(),
         subtitle: draft.subtitle.trim() || null,
@@ -301,6 +306,20 @@ export function ProductEditor({ productId }: { productId: string }) {
                     {!isNew && " — kept as it is, so existing links keep working."}
                   </p>
                 )}
+              </div>
+
+              <div className="sm:col-span-2">
+                <Field
+                  label="Title in Marathi / Hindi"
+                  hint="Shown under the English title. Leave blank if there isn't one."
+                >
+                  <Input
+                    value={draft.titleMr}
+                    onChange={(e) => set("titleMr", e.target.value)}
+                    placeholder="मिलींद प्रश्न"
+                    className="deva"
+                  />
+                </Field>
               </div>
 
               <div className="sm:col-span-2">

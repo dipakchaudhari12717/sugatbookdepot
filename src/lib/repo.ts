@@ -52,6 +52,7 @@ export const DEFAULT_SETTINGS: StoreSettings = {
   serviceablePincodes: [],
   codEnabled: true,
   upiEnabled: true,
+  razorpayEnabled: true,
   upiId: "sugatbookdepot@upi",
   announcement: "Free delivery across India on orders above ₹499",
   bannerLang: "both",

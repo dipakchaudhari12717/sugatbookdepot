@@ -3,13 +3,13 @@
 import { MediaImage } from "@/components/media-image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Banknote, Check, ChevronLeft, Lock, Smartphone, Truck } from "lucide-react";
+import { Banknote, Check, ChevronLeft, CreditCard, Lock, Smartphone, Truck } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 
 import { useAuth } from "@/lib/auth-context";
 import { useCart } from "@/lib/cart-context";
 import { useCatalog } from "@/lib/catalog-context";
-import { isFirebaseConfigured } from "@/lib/firebase";
+import { isFirebaseConfigured, isRazorpayConfigured } from "@/lib/firebase";
 import { createOrder, evaluateCoupon, findCoupon, updateUserProfile } from "@/lib/repo";
 import { useToast } from "@/lib/toast-context";
 import type { Address, Coupon, PaymentMethod } from "@/lib/types";
@@ -422,6 +422,30 @@ export function CheckoutPage() {
                 </button>
               )}
 
+              {settings.razorpayEnabled && isRazorpayConfigured && (
+                <button
+                  type="button"
+                  onClick={() => setPayment("razorpay")}
+                  className={cn(
+                    "flex w-full items-start gap-3.5 rounded-xl border p-4 text-left transition",
+                    payment === "razorpay"
+                      ? "border-saffron bg-saffron-wash"
+                      : "border-rule bg-paper hover:border-saffron/50",
+                  )}
+                >
+                  <CreditCard className="mt-0.5 size-5 shrink-0 text-saffron" />
+                  <span className="flex-1">
+                    <span className="block text-sm font-medium text-ink">
+                      Card, UPI, net banking or wallet
+                    </span>
+                    <span className="mt-0.5 block text-xs text-ink-faint">
+                      Pay securely through Razorpay. Your card details never reach us.
+                    </span>
+                  </span>
+                  {payment === "razorpay" && <Check className="size-4 shrink-0 text-saffron" />}
+                </button>
+              )}
+
               {settings.upiEnabled && (
                 <button
                   type="button"
@@ -467,8 +491,9 @@ export function CheckoutPage() {
 
             <p className="mt-4 flex items-start gap-2 text-xs text-ink-faint">
               <Lock className="mt-0.5 size-3.5 shrink-0" />
-              Card and net-banking payments will be enabled once the Razorpay account is live. Until
-              then, COD and UPI cover every order.
+              {isRazorpayConfigured
+                ? "Card payments are handled entirely by Razorpay — we never see or store your card details."
+                : "Card and net-banking will appear here once the Razorpay keys are added. Cash on Delivery and UPI cover every order in the meantime."}
             </p>
 
             <div className="mt-5">
@@ -561,7 +586,11 @@ export function CheckoutPage() {
             </dl>
 
             <Button size="lg" full className="mt-6" onClick={placeOrder} loading={placing}>
-              {payment === "cod" ? "Place order" : "Place order & pay"}
+              {payment === "cod"
+                ? "Place order"
+                : payment === "razorpay"
+                  ? "Pay securely"
+                  : "Place order & pay"}
             </Button>
 
             <p className="mt-3 text-center text-[0.6875rem] leading-relaxed text-ink-faint">

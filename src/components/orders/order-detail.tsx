@@ -4,7 +4,7 @@ import { MediaImage } from "@/components/media-image";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { doc, onSnapshot } from "firebase/firestore";
-import { CheckCircle2, ChevronLeft, Copy, MapPin, Package, Truck } from "lucide-react";
+import { CheckCircle2, ChevronLeft, Copy, FileText, MapPin, Package, Printer, Truck, X } from "lucide-react";
 import { useEffect, useState } from "react";
 
 import { getDb, isFirebaseConfigured } from "@/lib/firebase";
@@ -14,6 +14,7 @@ import type { Order } from "@/lib/types";
 import { formatDate, formatPrice } from "@/lib/utils";
 import { WhatsAppIcon } from "@/components/brand-icons";
 import { OrderTracker, StatusPill } from "@/components/order-status";
+import { Invoice } from "./invoice";
 import { Button, Card, EmptyState, LinkButton, Spinner } from "@/components/ui";
 
 const PAYMENT_LABEL: Record<string, string> = {
@@ -37,6 +38,7 @@ export function OrderDetail({ orderId }: { orderId: string }) {
 
   const [order, setOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState(true);
+  const [invoiceOpen, setInvoiceOpen] = useState(false);
 
   // Live subscription so the customer sees status changes the moment the shop
   // updates them in the admin panel (FR-5.2).
@@ -133,8 +135,28 @@ export function OrderDetail({ orderId }: { orderId: string }) {
           >
             <Copy className="size-3.5" /> Copy
           </Button>
+          <Button variant="secondary" size="sm" onClick={() => setInvoiceOpen(true)}>
+            <FileText className="size-3.5" /> Invoice
+          </Button>
         </div>
       </div>
+
+      {invoiceOpen && (
+        <div className="fixed inset-0 z-[95] overflow-y-auto bg-ink/50 p-4 backdrop-blur-sm print:static print:overflow-visible print:bg-transparent print:p-0">
+          <div className="mx-auto max-w-4xl print:max-w-none">
+            {/* Controls are hidden when printing, so only the sheet is on paper. */}
+            <div className="mb-3 flex justify-end gap-2 print:hidden">
+              <Button size="sm" onClick={() => window.print()}>
+                <Printer className="size-3.5" /> Print or save as PDF
+              </Button>
+              <Button variant="secondary" size="sm" onClick={() => setInvoiceOpen(false)}>
+                <X className="size-3.5" /> Close
+              </Button>
+            </div>
+            <Invoice order={order} />
+          </div>
+        </div>
+      )}
 
       <div className="mt-9 grid gap-10 lg:grid-cols-[1fr_22rem] lg:gap-14">
         <div className="space-y-8">

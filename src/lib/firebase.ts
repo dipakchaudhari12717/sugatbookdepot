@@ -63,3 +63,14 @@ export async function initAnalytics() {
     return null;
   }
 }
+
+/**
+ * Whether Razorpay has been configured for this deployment.
+ *
+ * Only the publishable key id is exposed to the browser; the secret stays on
+ * the server. Checkout uses this to decide whether the card option can be
+ * offered at all, so the shop can never switch on a payment method that has no
+ * keys behind it.
+ */
+export const RAZORPAY_KEY_ID = process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID ?? "";
+export const isRazorpayConfigured = Boolean(RAZORPAY_KEY_ID);

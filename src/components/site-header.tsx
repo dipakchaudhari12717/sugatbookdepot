@@ -356,6 +356,9 @@ export function SiteHeader() {
                       >
                         {p.title}
                       </p>
+                      {p.titleMr && (
+                        <p className="deva truncate text-xs text-ink-soft">{p.titleMr}</p>
+                      )}
                       <p className="truncate text-xs text-ink-faint">
                         {[p.author ?? p.brand, p.language].filter(Boolean).join(" · ")}
                       </p>

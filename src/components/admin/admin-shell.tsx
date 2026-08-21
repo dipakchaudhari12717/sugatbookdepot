@@ -113,6 +113,13 @@ export function AdminShell({ children }: { children: ReactNode }) {
               Admin
             </span>
           </Link>
+          <Link
+            href="/"
+            title="Back to the shop"
+            className="hidden items-center gap-1.5 rounded-full border border-rule-strong px-2.5 py-1 text-[0.6875rem] font-medium text-ink-soft transition hover:border-saffron hover:text-saffron-deep lg:inline-flex"
+          >
+            <Store className="size-3" /> Shop
+          </Link>
           <button
             type="button"
             onClick={() => setNavOpen(false)}
@@ -173,6 +180,9 @@ export function AdminShell({ children }: { children: ReactNode }) {
 
       {/* Content */}
       <div className="flex min-w-0 flex-1 flex-col">
+        {/* On a phone the sidebar is behind the hamburger, so without this there
+            is no visible way out of the admin panel. Keep a shop link in the bar
+            itself. */}
         <header className="sticky top-0 z-30 flex items-center gap-3 border-b border-rule bg-paper-raised/90 px-4 py-3 backdrop-blur-xl lg:hidden">
           <button
             type="button"
@@ -183,6 +193,12 @@ export function AdminShell({ children }: { children: ReactNode }) {
             <Menu className="size-5" />
           </button>
           <span className="font-display text-base font-semibold text-ink">Admin</span>
+          <Link
+            href="/"
+            className="ml-auto inline-flex items-center gap-1.5 rounded-full border border-rule-strong px-3 py-1.5 text-xs font-medium text-ink-soft transition hover:border-saffron hover:text-saffron-deep"
+          >
+            <Store className="size-3.5" /> View shop
+          </Link>
         </header>
 
         <main className="min-w-0 flex-1 p-4 sm:p-6 lg:p-8">{children}</main>

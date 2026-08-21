@@ -105,3 +105,31 @@ export function authErrorMessage(code: string) {
   };
   return map[code] ?? "Something went wrong. Please try again.";
 }
+
+/**
+ * Pull the video id out of any shape of YouTube link people actually paste —
+ * a watch URL, a share link, an embed, a Short, or the bare id itself.
+ */
+export function youtubeId(input: string): string | null {
+  const value = input.trim();
+  if (!value) return null;
+  if (/^[\w-]{11}$/.test(value)) return value;
+
+  const patterns = [
+    /[?&]v=([\w-]{11})/,
+    /youtu\.be\/([\w-]{11})/,
+    /youtube\.com\/embed\/([\w-]{11})/,
+    /youtube\.com\/shorts\/([\w-]{11})/,
+    /youtube\.com\/live\/([\w-]{11})/,
+  ];
+  for (const re of patterns) {
+    const m = value.match(re);
+    if (m) return m[1];
+  }
+  return null;
+}
+
+/** YouTube's own thumbnail, so a video needs no separate poster upload. */
+export function youtubeThumb(id: string) {
+  return `https://i.ytimg.com/vi/${id}/hqdefault.jpg`;
+}

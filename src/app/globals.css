@@ -441,3 +441,181 @@ input[type="number"] {
 .no-scrollbar::-webkit-scrollbar {
   display: none;
 }
+
+/* --------------------------------------------------------------------------
+   Invoice
+
+   Laid out for A4 and printed straight from the browser. On screen it sits in
+   a card; on paper it is the only thing that survives, so the shop gets a
+   clean letterhead document rather than a screenshot of a web page.
+   -------------------------------------------------------------------------- */
+
+.invoice-sheet {
+  background: #fff;
+  color: #1a1a1a;
+  padding: 2.25rem;
+  border-radius: 14px;
+  border: 1px solid var(--color-rule);
+  max-width: 52rem;
+  margin-inline: auto;
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+.invoice-head {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding-bottom: 1.25rem;
+  border-bottom: 2px solid var(--color-brand);
+}
+.invoice-brand { display: flex; gap: 0.875rem; align-items: flex-start; }
+.invoice-mark { width: 58px; height: 58px; object-fit: contain; flex: none; }
+.invoice-shop {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1.375rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--color-brand);
+}
+.invoice-tag {
+  margin: 0.1rem 0 0.4rem;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-ink-faint);
+}
+.invoice-addr {
+  margin: 0;
+  font-size: 0.75rem;
+  line-height: 1.55;
+  color: #4a4a4a;
+  font-style: normal;
+}
+
+.invoice-meta { text-align: right; margin-left: auto; }
+.invoice-word {
+  margin: 0 0 0.5rem;
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #1a1a1a;
+}
+.invoice-metatable { border-collapse: collapse; margin-left: auto; font-size: 0.75rem; }
+.invoice-metatable td { padding: 0.12rem 0.6rem 0.12rem 0; color: var(--color-ink-faint); text-align: right; }
+.invoice-metatable th { padding: 0.12rem 0; text-align: right; font-weight: 600; }
+
+.invoice-parties {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  padding: 1.25rem 0;
+}
+.invoice-label {
+  margin: 0 0 0.35rem;
+  font-size: 0.625rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-ink-faint);
+}
+.invoice-name { margin: 0 0 0.2rem; font-weight: 700; font-size: 0.9375rem; }
+
+.invoice-lines { width: 100%; border-collapse: collapse; margin-top: 0.5rem; }
+.invoice-lines thead th {
+  background: var(--color-brand);
+  color: #fff;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 0.55rem 0.7rem;
+  text-align: left;
+}
+.invoice-lines tbody td {
+  padding: 0.6rem 0.7rem;
+  border-bottom: 1px solid #e6e6e6;
+  vertical-align: top;
+}
+.invoice-lines tbody tr:nth-child(even) { background: #fafafa; }
+.line-title { display: block; font-weight: 600; }
+.line-opts { display: block; margin-top: 0.15rem; font-size: 0.75rem; color: #6a6a6a; }
+.col-num { width: 2.5rem; text-align: center; }
+.col-qty { width: 3.5rem; text-align: center; }
+.col-money { width: 7rem; text-align: right; font-variant-numeric: tabular-nums lining-nums; }
+.invoice-lines thead .col-money,
+.invoice-lines thead .col-qty,
+.invoice-lines thead .col-num { text-align: right; }
+.invoice-lines thead .col-qty, .invoice-lines thead .col-num { text-align: center; }
+
+.invoice-totals { display: flex; justify-content: flex-end; margin-top: 1rem; }
+.invoice-totals table { border-collapse: collapse; min-width: 17rem; }
+.invoice-totals td { padding: 0.32rem 0.7rem; }
+.invoice-totals tr.grand td {
+  border-top: 2px solid #1a1a1a;
+  padding-top: 0.5rem;
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+.invoice-words {
+  margin: 1rem 0 0;
+  padding: 0.6rem 0.75rem;
+  background: var(--color-brand-wash, #e9f4ee);
+  border-radius: 6px;
+  font-size: 0.8125rem;
+}
+
+.invoice-foot {
+  margin-top: 1.75rem;
+  padding-top: 1rem;
+  border-top: 1px solid #e6e6e6;
+  font-size: 0.72rem;
+  color: #6a6a6a;
+}
+.invoice-foot p { margin: 0 0 0.35rem; }
+.invoice-thanks { font-weight: 600; color: var(--color-brand); }
+.invoice-computer { font-style: italic; }
+
+@media (max-width: 640px) {
+  .invoice-sheet { padding: 1.25rem; }
+  .invoice-parties { grid-template-columns: 1fr; gap: 1.25rem; }
+  .invoice-meta { text-align: left; margin-left: 0; }
+  .invoice-metatable { margin-left: 0; }
+  .invoice-metatable td, .invoice-metatable th { text-align: left; }
+}
+
+/* Only the invoice reaches the paper. */
+@media print {
+  @page { size: A4; margin: 14mm; }
+
+  body { background: #fff !important; }
+  body * { visibility: hidden !important; }
+  #invoice, #invoice * { visibility: visible !important; }
+  #invoice {
+    position: absolute;
+    inset: 0 auto auto 0;
+    width: 100%;
+    max-width: none;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+  }
+  /* Keep the header band and zebra striping when printing. */
+  .invoice-lines thead th,
+  .invoice-lines tbody tr:nth-child(even),
+  .invoice-words {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  .invoice-lines { page-break-inside: auto; }
+  .invoice-lines tr { page-break-inside: avoid; }
+}

@@ -279,6 +279,12 @@ export function ProductDetail({ slug }: { slug: string }) {
             {product.title}
           </h1>
 
+          {product.titleMr && (
+            <p className="deva mt-1.5 font-display text-2xl leading-snug text-ink-soft sm:text-3xl">
+              {product.titleMr}
+            </p>
+          )}
+
           {product.subtitle && (
             <p className="mt-3 text-[0.9375rem] leading-relaxed text-ink-soft">{product.subtitle}</p>
           )}

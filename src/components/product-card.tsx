@@ -178,6 +178,13 @@ export function ProductCard({
           </Link>
         </h3>
 
+        {/* The Marathi/Hindi title, for customers who know the book by that name */}
+        {product.titleMr && (
+          <p className="deva mt-0.5 line-clamp-1 text-[0.8125rem] leading-snug text-ink-soft">
+            {product.titleMr}
+          </p>
+        )}
+
         {product.subtitle && (
           <p className="mt-1 line-clamp-1 text-xs text-ink-faint">{product.subtitle}</p>
         )}

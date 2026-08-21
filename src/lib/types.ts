@@ -36,6 +36,8 @@ export interface Product {
   slug: string;
   sku: string;
   title: string;
+  /** The Devanagari title, shown alongside the English one where we have it. */
+  titleMr: string | null;
   subtitle: string | null;
   badge: string | null;
   category: string;
@@ -121,7 +123,7 @@ export const ORDER_STATUS_FLOW: OrderStatus[] = [
   "delivered",
 ];
 
-export type PaymentMethod = "cod" | "upi";
+export type PaymentMethod = "cod" | "upi" | "razorpay";
 export type PaymentStatus = "pending" | "awaiting_verification" | "paid" | "refunded" | "failed";
 
 export interface OrderEvent {
@@ -205,6 +207,13 @@ export interface StoreSettings {
   serviceablePincodes: string[];
   codEnabled: boolean;
   upiEnabled: boolean;
+  /**
+   * Card / net-banking / wallets through Razorpay. Switching this on only has
+   * an effect once RAZORPAY_KEY_ID is present in the environment — the
+   * checkout hides the option otherwise, so it can never be offered without
+   * keys behind it.
+   */
+  razorpayEnabled: boolean;
   upiId: string;
   announcement: string;
   /** Which shopfront banner shows on the home page. */
@@ -222,7 +231,12 @@ export interface GalleryItem {
   id: string;
   title: string;
   description: string;
+  /** Photograph, or the poster frame for a video. */
   image: string;
+  /** "photo" for a still, "video" for an embedded YouTube clip. */
+  kind?: "photo" | "video";
+  /** The YouTube video id, for kind === "video". */
+  youtubeId?: string | null;
   /** Free-text grouping shown as filter chips, e.g. "Shop", "Chivar Daan". */
   album: string;
   /** Lower numbers appear first; ties fall back to newest. */

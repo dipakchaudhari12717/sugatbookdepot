@@ -1,6 +1,6 @@
 "use client";
 
-import Image from "next/image";
+import { MediaImage } from "@/components/media-image";
 import { Pencil, Plus, Store, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
 
@@ -10,6 +10,7 @@ import { useToast } from "@/lib/toast-context";
 import type { Banner } from "@/lib/types";
 import { Button, Field, Input, Modal, Spinner, Textarea } from "@/components/ui";
 import { PageHeader } from "@/components/admin/admin-ui";
+import { ImageField } from "@/components/admin/image-field";
 
 interface Draft {
   title: string;
@@ -78,8 +79,6 @@ export default function AdminBannersPage() {
 
   async function save() {
     if (!draft.title.trim()) return setError("A headline is required.");
-    if (draft.image && !/^https?:\/\//i.test(draft.image))
-      return setError("The image link must start with https://");
 
     setBusy(true);
     try {
@@ -151,7 +150,7 @@ export default function AdminBannersPage() {
             >
               <div className="relative h-36 bg-gradient-to-br from-saffron-wash to-paper-sunk">
                 {b.image && (
-                  <Image src={b.image} alt="" fill sizes="400px" className="object-cover opacity-70" unoptimized />
+                  <MediaImage src={b.image} alt="" fill sizes="400px" className="object-cover opacity-70" />
                 )}
                 <div className="absolute inset-0 flex flex-col justify-center p-5">
                   <p className="font-display text-lg font-semibold text-ink">{b.title}</p>
@@ -231,13 +230,12 @@ export default function AdminBannersPage() {
             />
           </Field>
           <div className="sm:col-span-2">
-            <Field label="Background image URL" hint="Optional — sits behind the text at low opacity">
-              <Input
-                value={draft.image}
-                onChange={(e) => setDraft({ ...draft, image: e.target.value })}
-                placeholder="https://…"
-              />
-            </Field>
+            <ImageField
+              label="Background image"
+              value={draft.image}
+              onChange={(next) => setDraft({ ...draft, image: next })}
+              hint="Optional — sits behind the headline at low opacity."
+            />
           </div>
           <Field label="Order">
             <Input

@@ -290,10 +290,36 @@ export function Reveal({
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
+
+    // Anything already on screen at mount is shown straight away, without
+    // waiting on the observer. This also covers a reload part-way down a long
+    // page, where the cards above the fold would otherwise fade in late.
+    const onScreenNow = () => {
+      const r = el.getBoundingClientRect();
+      return r.top < window.innerHeight && r.bottom > 0;
+    };
+    if (onScreenNow()) {
+      setVisible(true);
+      return;
+    }
+
     if (typeof IntersectionObserver === "undefined") {
       setVisible(true);
       return;
     }
+
+    /**
+     * A hidden document runs no rendering lifecycle, so neither
+     * IntersectionObserver nor scroll events fire — content would stay at
+     * opacity 0 until the tab was focused, and on a restored session that may
+     * be never. There is nothing to animate for a viewer who cannot see the
+     * page, so skip the effect and just show it.
+     */
+    if (document.hidden) {
+      setVisible(true);
+      return;
+    }
+
     const io = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
@@ -304,7 +330,29 @@ export function Reveal({
       { threshold: 0.12, rootMargin: "0px 0px -40px 0px" },
     );
     io.observe(el);
-    return () => io.disconnect();
+
+    /**
+     * Safety net. IntersectionObserver does not deliver callbacks while the
+     * document is hidden — a background tab, a restored session, an occluded
+     * window — and without this the content would sit at opacity 0 for good,
+     * which reads to a visitor as a page that will not scroll. Re-check on
+     * scroll and when the tab becomes visible again, and give up on the
+     * animation entirely rather than ever hide content.
+     */
+    const settle = () => {
+      if (onScreenNow()) {
+        setVisible(true);
+        io.disconnect();
+      }
+    };
+    window.addEventListener("scroll", settle, { passive: true });
+    document.addEventListener("visibilitychange", settle);
+
+    return () => {
+      io.disconnect();
+      window.removeEventListener("scroll", settle);
+      document.removeEventListener("visibilitychange", settle);
+    };
   }, []);
 
   return (

@@ -107,14 +107,18 @@ async function main() {
       String(data.description ?? "").includes("<p>");
     const optionImagesStale =
       JSON.stringify(data.optionImages ?? null) !== JSON.stringify(nextOptionImages);
+    const titleStale =
+      (data.title ?? "") !== source.title ||
+      (data.titleMr ?? null) !== (source.titleMr ?? null);
 
-    if (!encoded && !optionImagesStale) {
+    if (!encoded && !optionImagesStale && !titleStale) {
       alreadyClean++;
       continue;
     }
 
     batch.update(doc(db, "products", d.id), {
       title: source.title,
+      titleMr: source.titleMr ?? null,
       subtitle: source.subtitle,
       descriptionHtml: source.descriptionHtml,
       description: source.description,

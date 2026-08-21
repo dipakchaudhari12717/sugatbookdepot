@@ -1,6 +1,6 @@
 "use client";
 
-import Image from "next/image";
+import { MediaImage } from "@/components/media-image";
 import Link from "next/link";
 import { ExternalLink, ImagePlus, Newspaper, Pencil, Plus, Trash2 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
@@ -184,13 +184,12 @@ export default function AdminBlogPage() {
             >
               <div className="relative h-16 w-24 shrink-0 overflow-hidden rounded-lg bg-paper-sunk">
                 {post.coverImage ? (
-                  <Image
+                  <MediaImage
                     src={post.coverImage}
                     alt=""
                     fill
                     sizes="96px"
                     className="object-cover"
-                    unoptimized
                   />
                 ) : (
                   <div className="flex size-full items-center justify-center">

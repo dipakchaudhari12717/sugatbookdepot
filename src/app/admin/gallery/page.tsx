@@ -1,14 +1,14 @@
 "use client";
 
-import Image from "next/image";
-import { ImageIcon, Pencil, Plus, Trash2 } from "lucide-react";
+import { MediaImage } from "@/components/media-image";
+import { ImageIcon, Pencil, Plus, Trash2, Video } from "lucide-react";
 import { useEffect, useState } from "react";
 
 import { isFirebaseConfigured } from "@/lib/firebase";
 import { deleteGalleryItem, saveGalleryItem, subscribeGallery } from "@/lib/repo";
 import { useToast } from "@/lib/toast-context";
 import { GALLERY_ALBUMS, type GalleryItem } from "@/lib/types";
-import { cn } from "@/lib/utils";
+import { cn, youtubeId, youtubeThumb } from "@/lib/utils";
 import { Button, Field, Input, Modal, Select, Spinner, Textarea } from "@/components/ui";
 import { ImageField } from "@/components/admin/image-field";
 import { PageHeader } from "@/components/admin/admin-ui";
@@ -16,6 +16,8 @@ import { PageHeader } from "@/components/admin/admin-ui";
 interface Draft {
   title: string;
   description: string;
+  kind: "photo" | "video";
+  youtubeUrl: string;
   image: string;
   album: string;
   order: number;
@@ -26,6 +28,8 @@ interface Draft {
 const EMPTY: Draft = {
   title: "",
   description: "",
+  kind: "photo",
+  youtubeUrl: "",
   image: "",
   album: "Shop",
   order: 1,
@@ -69,6 +73,8 @@ export default function AdminGalleryPage() {
     setDraft({
       title: item.title ?? "",
       description: item.description ?? "",
+      kind: item.kind ?? "photo",
+      youtubeUrl: item.youtubeId ?? "",
       image: item.image ?? "",
       album: item.album ?? "Shop",
       order: item.order ?? 1,
@@ -80,15 +86,29 @@ export default function AdminGalleryPage() {
   }
 
   async function save() {
-    if (!draft.title.trim()) return setError("Give the photograph a short title.");
-    if (!draft.image.trim()) return setError("Please choose a photograph.");
+    if (!draft.title.trim()) return setError("Give it a short title.");
+
+    // A video only needs a link — YouTube supplies the still.
+    let videoId: string | null = null;
+    if (draft.kind === "video") {
+      videoId = youtubeId(draft.youtubeUrl);
+      if (!videoId) {
+        return setError("That does not look like a YouTube link. Paste the address from the video's Share button.");
+      }
+    } else if (!draft.image.trim()) {
+      return setError("Please choose a photograph.");
+    }
+
+    const poster = draft.kind === "video" ? youtubeThumb(videoId!) : draft.image.trim();
 
     setBusy(true);
     try {
       await saveGalleryItem(editing?.id ?? null, {
         title: draft.title.trim(),
         description: draft.description.trim(),
-        image: draft.image.trim(),
+        kind: draft.kind,
+        youtubeId: videoId,
+        image: poster,
         album: draft.album.trim(),
         order: Number(draft.order) || 0,
         published: draft.published,
@@ -130,10 +150,10 @@ export default function AdminGalleryPage() {
     <div>
       <PageHeader
         title="Gallery"
-        description="Photographs shown on the public gallery page. Changes appear on the site immediately."
+        description="Photographs and YouTube videos shown on the public gallery. Changes appear on the site immediately."
         action={
           <Button size="sm" onClick={openNew} disabled={!isFirebaseConfigured}>
-            <Plus className="size-3.5" /> Add photograph
+            <Plus className="size-3.5" /> Add to gallery
           </Button>
         }
       />
@@ -164,13 +184,12 @@ export default function AdminGalleryPage() {
             >
               <div className="relative aspect-4/3 bg-paper-sunk">
                 {item.image && (
-                  <Image
+                  <MediaImage
                     src={item.image}
                     alt={item.title}
                     fill
                     sizes="300px"
                     className="object-cover"
-                    unoptimized
                   />
                 )}
                 <span
@@ -181,6 +200,11 @@ export default function AdminGalleryPage() {
                 >
                   {item.published === false ? "Draft" : "Live"}
                 </span>
+                {item.kind === "video" && (
+                  <span className="absolute left-2.5 top-2.5 flex items-center gap-1 rounded-full bg-ink/80 px-2 py-1 text-[0.625rem] font-semibold text-paper">
+                    <Video className="size-3" /> Video
+                  </span>
+                )}
               </div>
 
               <div className="p-4">
@@ -229,17 +253,68 @@ export default function AdminGalleryPage() {
       <Modal
         open={open}
         onClose={() => setOpen(false)}
-        title={editing ? "Edit photograph" : "Add photograph"}
+        title={editing ? "Edit gallery item" : "Add to the gallery"}
       >
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="sm:col-span-2">
-            <ImageField
-              label="Photograph"
-              value={draft.image}
-              onChange={(next) => setDraft({ ...draft, image: next })}
-              aspect="aspect-4/3"
-            />
+            <span className="mb-1.5 block text-[0.8125rem] font-medium text-ink">Type</span>
+            <div className="flex gap-2">
+              {(["photo", "video"] as const).map((k) => (
+                <button
+                  key={k}
+                  type="button"
+                  onClick={() => setDraft({ ...draft, kind: k })}
+                  className={cn(
+                    "flex items-center gap-2 rounded-full border px-4 py-2 text-[0.8125rem] font-medium transition",
+                    draft.kind === k
+                      ? "border-saffron bg-saffron-wash text-saffron-deep"
+                      : "border-rule-strong bg-paper-raised text-ink-soft hover:border-saffron/60",
+                  )}
+                >
+                  {k === "photo" ? <ImageIcon className="size-3.5" /> : <Video className="size-3.5" />}
+                  {k === "photo" ? "Photograph" : "YouTube video"}
+                </button>
+              ))}
+            </div>
           </div>
+
+          {draft.kind === "video" ? (
+            <div className="sm:col-span-2">
+              <Field
+                label="YouTube link"
+                required
+                hint="Paste the address from the video's Share button. The still is taken from YouTube automatically."
+              >
+                <Input
+                  value={draft.youtubeUrl}
+                  onChange={(e) => setDraft({ ...draft, youtubeUrl: e.target.value })}
+                  placeholder="https://www.youtube.com/watch?v=…"
+                />
+              </Field>
+
+              {youtubeId(draft.youtubeUrl) && (
+                <div className="mt-3 overflow-hidden rounded-xl border border-rule">
+                  <div className="relative aspect-video">
+                    <iframe
+                      src={`https://www.youtube-nocookie.com/embed/${youtubeId(draft.youtubeUrl)}?rel=0`}
+                      title="Preview"
+                      allowFullScreen
+                      className="absolute inset-0 size-full border-0"
+                    />
+                  </div>
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className="sm:col-span-2">
+              <ImageField
+                label="Photograph"
+                value={draft.image}
+                onChange={(next) => setDraft({ ...draft, image: next })}
+                aspect="aspect-4/3"
+              />
+            </div>
+          )}
 
           <div className="sm:col-span-2">
             <Field label="Title" required>

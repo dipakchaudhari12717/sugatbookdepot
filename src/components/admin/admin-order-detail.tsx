@@ -3,7 +3,7 @@
 import { MediaImage } from "@/components/media-image";
 import Link from "next/link";
 import { doc, onSnapshot } from "firebase/firestore";
-import { ChevronLeft, Copy, MapPin, Printer, Truck, User } from "lucide-react";
+import { ChevronLeft, Copy, FileText, MapPin, Printer, Truck, User, X } from "lucide-react";
 import { useEffect, useState } from "react";
 
 import { getDb, isFirebaseConfigured } from "@/lib/firebase";
@@ -15,6 +15,7 @@ import { cn, formatDateTime, formatPrice } from "@/lib/utils";
 import { OrderTracker, STATUS_LABEL, StatusPill } from "@/components/order-status";
 import { Button, Card, Field, Input, Modal, Select, Spinner, Textarea } from "@/components/ui";
 import { PageHeader } from "./admin-ui";
+import { Invoice } from "@/components/orders/invoice";
 
 const PAYMENT_STATUSES: PaymentStatus[] = [
   "pending",
@@ -31,6 +32,7 @@ export function AdminOrderDetail({ orderId }: { orderId: string }) {
   const [order, setOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
+  const [invoiceOpen, setInvoiceOpen] = useState(false);
 
   const [carrier, setCarrier] = useState("");
   const [tracking, setTracking] = useState("");
@@ -163,8 +165,8 @@ export function AdminOrderDetail({ orderId }: { orderId: string }) {
         action={
           <div className="flex flex-wrap items-center gap-2">
             <StatusPill status={order.status} />
-            <Button variant="quiet" size="sm" onClick={() => window.print()}>
-              <Printer className="size-3.5" /> Print
+            <Button variant="secondary" size="sm" onClick={() => setInvoiceOpen(true)}>
+              <FileText className="size-3.5" /> Invoice
             </Button>
           </div>
         }
@@ -201,6 +203,22 @@ export function AdminOrderDetail({ orderId }: { orderId: string }) {
             </div>
           </div>
         </Card>
+      )}
+
+      {invoiceOpen && (
+        <div className="fixed inset-0 z-[95] overflow-y-auto bg-ink/50 p-4 backdrop-blur-sm print:static print:overflow-visible print:bg-transparent print:p-0">
+          <div className="mx-auto max-w-4xl print:max-w-none">
+            <div className="mb-3 flex justify-end gap-2 print:hidden">
+              <Button size="sm" onClick={() => window.print()}>
+                <Printer className="size-3.5" /> Print or save as PDF
+              </Button>
+              <Button variant="secondary" size="sm" onClick={() => setInvoiceOpen(false)}>
+                <X className="size-3.5" /> Close
+              </Button>
+            </div>
+            <Invoice order={order} />
+          </div>
+        </div>
       )}
 
       <div className="grid gap-6 lg:grid-cols-[1fr_20rem]">

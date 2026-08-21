@@ -358,6 +358,56 @@ const ENRICHMENT = {
   },
 };
 
+
+/**
+ * Devanagari titles, shown next to the English ones.
+ *
+ * Two sources, and only these two — inventing a title for a book nobody can
+ * check would be worse than leaving it blank:
+ *   • the Devanagari already inside the scraped title, in brackets
+ *   • titles legible on the cover photograph itself
+ * Everything else is the standard Marathi/Hindi name of a well-known work.
+ * All of them are editable in the admin panel, and the shop should check them.
+ */
+const DEVANAGARI_TITLES = {
+  "milind-prashna-book": "मिलींद प्रश्न",
+  "annihilation-of-caste-marathi-translation-": "जातिभेद निर्मूलन",
+  "visuddhimagga-": "विशुद्धिमग्ग",
+  "riddles-in-hinduism-": "हिंदूधर्माचे कोडे",
+  "the-buddha-and-his-dhamma": "भगवान बुद्ध आणि त्यांचा धम्म",
+  "bhagwan-buddha-aur-unka-dhamma": "भगवान बुद्ध और उनका धम्म",
+  "bhagwan-gautam-buddha-charitra-va-shikavan": "भगवान गौतम बुद्ध (चरित्र व शिकवण)",
+  "jatak-katha": "जातक कथा",
+  "buddha-puja-path": "बुद्ध पूजा पाठ",
+  "kranti-ani-pratikranti": "क्रांती आणि प्रतिक्रांती",
+  "deshache-dushman": "देशाचे दुश्मन",
+  "hindu-striyanchi-unnati-ani-avanti": "हिंदू स्त्रियांची उन्नती आणि अवनती",
+  "maharlok-mahat-folk": "महारलोक",
+  "babasaheb-ambedkar-jeevan-charitra-book": "बाबासाहेब आंबेडकर जीवन-चरित्र",
+  "vidhyarthano-jagrut-hwa": "विद्यार्थ्यांनो जागृत व्हा!",
+  "aspurushya-moolache-kon-who-are-the-untouchables": "अस्पृश्य मूळचे कोण?",
+  "buddha-marx-and-the-future-of-religion": "बुद्ध, मार्क्स आणि धर्माचे भवितव्य",
+  "buddhist-literature-and-teachings": "शूद्र पूर्वी कोण होते?",
+  "buddhist-books-and-teachings": "रुपयाची समस्या",
+  "buddhist-literature-and-teachings-1": "सावित्रीबाई फुले",
+  "buddhist-literature-collection": "संत कबीर — जीवन चरित्र",
+  "buddhist-literature-and-teachings-2": "सम्राट अशोक",
+  "buddhist-literature-and-teachings-3": "पाकिस्तान अथवा भारताची फाळणी",
+  "chivar-traditional-buddhist-monk-robe-or-pure-lightweight-and-comfortable": "चीवर",
+};
+
+/** Pull the Devanagari out of a title like "Visuddhimagga (विशुद्धिमग्ग)". */
+function devanagariFromTitle(title) {
+  const inBrackets = title.match(/[（(]\s*([ऀ-ॿ][^)）]*)[)）]/);
+  if (inBrackets) return inBrackets[1].trim();
+  return null;
+}
+
+/** The English half, with any Devanagari bracket stripped off. */
+function stripDevanagariBracket(title) {
+  return title.replace(/\s*[（(]\s*[ऀ-ॿ][^)）]*[)）]/, "").trim();
+}
+
 /** Everything remaining is stationery; brand is the first word of the title. */
 const STATIONERY_DEFAULTS = { category: "stationery", stock: 200 };
 
@@ -432,8 +482,14 @@ async function main() {
     // Legacy store stored a mixed-case ribbon; the storefront wants one badge.
     const badge = normaliseBadge(p.ribbon);
 
-    const title = decodeEntities(p.title).trim();
+    const rawTitle = decodeEntities(p.title).trim();
     const subtitle = decodeEntities(p.subtitle).trim();
+
+    // Prefer a curated Devanagari title; otherwise lift one out of the brackets
+    // in the scraped title, and drop it from the English half so the two are
+    // not printed twice.
+    const titleMr = DEVANAGARI_TITLES[p.slug] ?? devanagariFromTitle(rawTitle);
+    const title = titleMr ? stripDevanagariBracket(rawTitle) : rawTitle;
 
     const brand =
       category === "stationery" ? title.split(/\s+/)[0].replace(/'s$/i, "") : undefined;
@@ -459,6 +515,7 @@ async function main() {
       legacyId: p.legacyId,
       sku: skuFor(p.slug, category, i),
       title,
+      titleMr: titleMr ?? null,
       subtitle: subtitle || null,
       badge,
       category,
@@ -494,7 +551,7 @@ async function main() {
       // for a search service (SRS FR-1.3, free-tier constraint).
       searchTokens: [
         ...new Set(
-          [title, subtitle, extra.author, extra.language, extra.publisher, brand, ...(extra.tags ?? [])]
+          [title, titleMr, subtitle, extra.author, extra.language, extra.publisher, brand, ...(extra.tags ?? [])]
             .filter(Boolean)
             .join(" ")
             .toLowerCase()

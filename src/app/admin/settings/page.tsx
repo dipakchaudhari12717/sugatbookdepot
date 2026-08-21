@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 
 import { useCatalog } from "@/lib/catalog-context";
-import { isFirebaseConfigured } from "@/lib/firebase";
+import { isFirebaseConfigured, isRazorpayConfigured } from "@/lib/firebase";
 import { saveSettings } from "@/lib/repo";
 import { useToast } from "@/lib/toast-context";
 import type { StoreSettings } from "@/lib/types";
@@ -137,10 +137,29 @@ export default function AdminSettingsPage() {
               />
             </Field>
 
+            <label className="flex cursor-pointer items-start gap-3">
+              <input
+                type="checkbox"
+                checked={draft.razorpayEnabled ?? false}
+                onChange={(e) => set("razorpayEnabled", e.target.checked)}
+                className="mt-0.5 size-4 accent-[var(--color-saffron)]"
+              />
+              <span>
+                <span className="block text-sm font-medium text-ink">
+                  Card, UPI, net banking &amp; wallets — via Razorpay
+                </span>
+                <span className="block text-xs text-ink-faint">
+                  {isRazorpayConfigured
+                    ? "Keys are configured. Customers can pay by card at checkout."
+                    : "Waiting on the Razorpay keys. Until they are added this option stays hidden from customers, even when ticked."}
+                </span>
+              </span>
+            </label>
+
             <p className="rounded-xl bg-paper-sunk px-4 py-3 text-xs leading-relaxed text-ink-soft">
-              Card and net-banking payments need a payment gateway (Razorpay or PayU). Once the
-              business KYC is approved and you have API keys, that can be added on top of these
-              options without changing anything else.
+              {isRazorpayConfigured
+                ? "Razorpay is live. Payments settle to the bank account registered on your Razorpay dashboard."
+                : "To switch card payments on, add NEXT_PUBLIC_RAZORPAY_KEY_ID, RAZORPAY_KEY_SECRET and RAZORPAY_WEBHOOK_SECRET to the site's environment variables. Nothing else needs to change."}
             </p>
           </div>
         </Card>
