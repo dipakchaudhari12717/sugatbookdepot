@@ -40,12 +40,35 @@ export function hasDevanagari(text: string) {
 }
 
 export function slugify(text: string) {
-  return text
-    .toLowerCase()
-    .trim()
-    .replace(/[^\p{L}\p{N}]+/gu, "-")
-    .replace(/^-+|-+$/g, "")
-    .slice(0, 80);
+  return (
+    text
+      .normalize("NFC")
+      .toLowerCase()
+      .trim()
+      // \p{M} keeps Devanagari matras attached to their consonant. Without it
+      // "चीवर" collapses to "च-वर".
+      .replace(/[^\p{L}\p{N}\p{M}]+/gu, "-")
+      .replace(/^-+|-+$/g, "")
+      .slice(0, 80)
+      // The slice can land mid-word, so tidy the tail again.
+      .replace(/-+$/, "")
+  );
+}
+
+/**
+ * Next.js hands dynamic route params through percent-encoded when the segment
+ * holds non-ASCII characters, which every Devanagari slug does. Decode before
+ * matching against the slugs stored in Firestore, and normalise so two
+ * spellings of the same Devanagari word compare equal.
+ */
+export function decodeSlugParam(raw: string) {
+  let decoded = raw;
+  try {
+    decoded = decodeURIComponent(raw);
+  } catch {
+    // A malformed escape sequence just means it was never encoded.
+  }
+  return decoded.normalize("NFC");
 }
 
 /** SBD-7K2M9 — short, human-readable, and easy to read out over the phone. */

@@ -10,6 +10,7 @@ import {
   subscribeSettings,
 } from "./repo";
 import type { Banner, Category, Product, StoreSettings } from "./types";
+import { decodeSlugParam } from "./utils";
 
 interface CatalogValue {
   products: Product[];
@@ -56,7 +57,7 @@ export function CatalogProvider({ children }: { children: ReactNode }) {
 
   const value = useMemo<CatalogValue>(() => {
     const byId = new Map(products.map((p) => [p.id, p]));
-    const bySlug = new Map(products.map((p) => [p.slug, p]));
+    const bySlug = new Map(products.map((p) => [decodeSlugParam(p.slug), p]));
     const categoryBySlug = new Map(categories.map((c) => [c.slug, c]));
 
     const counts = new Map<string, number>();

@@ -8,7 +8,7 @@ import { useEffect, useMemo, useState } from "react";
 import { subscribeBlogPosts } from "@/lib/repo";
 import { useToast } from "@/lib/toast-context";
 import type { BlogPost } from "@/lib/types";
-import { formatDate } from "@/lib/utils";
+import { decodeSlugParam, formatDate } from "@/lib/utils";
 import { EmptyState, LinkButton, Reveal, Spinner } from "@/components/ui";
 
 export function BlogPostView({ slug }: { slug: string }) {
@@ -25,7 +25,12 @@ export function BlogPostView({ slug }: { slug: string }) {
     [],
   );
 
-  const post = useMemo(() => posts.find((p) => p.slug === slug), [posts, slug]);
+  // Decode on both sides: the route param may still be percent-encoded, and
+  // stored Devanagari slugs are not guaranteed to be normalised the same way.
+  const post = useMemo(() => {
+    const wanted = decodeSlugParam(slug);
+    return posts.find((p) => decodeSlugParam(p.slug ?? "") === wanted);
+  }, [posts, slug]);
 
   // Prefer posts sharing a tag, then fall back to whatever else is recent.
   const related = useMemo(() => {

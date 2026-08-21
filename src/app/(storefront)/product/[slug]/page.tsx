@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 
 import { ProductDetail } from "@/components/product/product-detail";
 import { FALLBACK_PRODUCTS } from "@/lib/catalog-fallback";
+import { decodeSlugParam } from "@/lib/utils";
 
 /**
  * Pre-render the catalog we migrated. Products added later in the admin panel
@@ -13,8 +14,8 @@ export function generateStaticParams() {
 }
 
 export async function generateMetadata(props: PageProps<"/product/[slug]">): Promise<Metadata> {
-  const { slug } = await props.params;
-  const product = FALLBACK_PRODUCTS.find((p) => p.slug === slug);
+  const slug = decodeSlugParam((await props.params).slug);
+  const product = FALLBACK_PRODUCTS.find((p) => decodeSlugParam(p.slug) === slug);
 
   if (!product) {
     return { title: "Product" };
@@ -35,6 +36,7 @@ export async function generateMetadata(props: PageProps<"/product/[slug]">): Pro
 }
 
 export default async function Page(props: PageProps<"/product/[slug]">) {
-  const { slug } = await props.params;
+  // Non-ASCII slugs arrive percent-encoded — decode so the catalog lookup hits.
+  const slug = decodeSlugParam((await props.params).slug);
   return <ProductDetail slug={slug} />;
 }
