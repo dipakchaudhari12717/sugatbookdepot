@@ -168,14 +168,22 @@ export function HomePage() {
           <Reveal>
             <div className="relative overflow-hidden rounded-3xl border border-saffron/25 bg-gradient-to-br from-saffron-wash via-paper-raised to-paper-sunk">
               <div className="grid gap-0 lg:grid-cols-2">
-                <div className="relative min-h-72 lg:min-h-[26rem]">
+                {/*
+                  The robe photographs are square, and this panel was a 4:3
+                  landscape, so covering it cut a quarter of the height away —
+                  which on a standing figure means the head and the feet. The
+                  panel is square instead, matching the photographs, and the
+                  image is fitted rather than covered so a picture that is not
+                  square is letterboxed rather than trimmed.
+                */}
+                <div className="relative aspect-square">
                   {chivar.image && (
                     <MediaImage
                       src={chivar.image}
                       alt={chivar.title}
                       fill
                       sizes="(max-width: 1024px) 100vw, 50vw"
-                      className="object-cover"
+                      className="object-contain"
                     />
                   )}
                   <div
