@@ -158,6 +158,90 @@ there if you start using a different one.
 
 ---
 
+## Walking a client through an order
+
+Everything below works today with **Cash on Delivery** — no payment gateway, no
+keys, nothing to configure. It is the right way to demonstrate the shop while
+Razorpay is still being sorted out.
+
+If you would rather the card option did not appear at all during a demo, untick
+*Card, UPI, net banking & wallets* in **Admin → Settings**. Checkout then offers
+Cash on Delivery alone.
+
+### 1. Place the order (as a customer)
+
+1. Open the shop, pick any product, **Add to bag**.
+2. **Go to bag → Checkout**.
+3. Fill the delivery form. Real-looking values matter here — name, address and
+   phone are printed on the invoice.
+4. Leave **Cash on Delivery** selected and press **Place order**.
+
+The order is written to Firestore and you land on its page immediately.
+
+### 2. The order page
+
+The customer arrives at `/orders/<id>` with a confirmation banner and their
+order number — `SBD-` followed by six characters, e.g. `SBD-QSUSWQ`. Chosen to
+be short enough to read out over the phone.
+
+The page carries the delivery tracker (Placed → Confirmed → Packed → Shipped →
+Delivered, each stamped with its time), the items, the address, the totals, a
+**Copy** button for the order number, and **Invoice**.
+
+Getting back to it later:
+
+- **Signed in** — *Account → Orders*, or `/orders`, lists everything on that
+  account.
+- **Guest** — `/orders` has a *Track an order* box; the order number is enough.
+  No sign-in, because guests can check out (FR-3.4).
+
+### 3. The invoice
+
+Press **Invoice** on the order page. It opens over the page as an A4 sheet:
+
+- shop letterhead — name, "Buddhist Literature · Since 1967", address, phone,
+  email;
+- invoice number (the order number), date, payment method, payment status;
+- **Billed to** and **Dispatched from** blocks side by side, with the courier
+  and consignment number once the order has shipped;
+- the item table — description with any chosen options ("Size: Free size 2 piece
+  set · Color: Orange"), quantity, rate, amount;
+- subtotal, catalogue savings, delivery, total;
+- the total spelled out in words using Indian numbering — *Three Thousand Rupees
+  Only*, and a lakh is a lakh rather than a hundred thousand.
+
+**Print or save as PDF** opens the browser's print dialog. The print rules hide
+the rest of the page, so only the sheet reaches the paper; in that dialog,
+choosing *Save as PDF* as the destination gives the customer the identical
+document as a file. Nothing is generated on the server and there is no PDF
+library involved.
+
+### 4. The same order, from the shop's side
+
+**Admin → Orders**, then open the order. From there the shop can:
+
+- move it along the fulfilment flow — Confirm, Pack, Ship, Deliver — each step
+  stamped into the timeline the customer sees;
+- add the courier name and consignment number, which then appear on both the
+  order page and the invoice;
+- set the payment status — pending, awaiting verification, paid, refunded,
+  failed;
+- cancel with a reason;
+- open the same **Invoice**, identical to the customer's copy.
+
+Stock is decremented when an order is confirmed, so the catalogue counts follow
+along too.
+
+### A demo that shows the whole loop
+
+Place an order as a customer, then open Admin → Orders in a second tab and walk
+it through Confirm → Pack → Ship, adding a courier and consignment number. Go
+back to the customer tab: the tracker has moved on its own, without a reload,
+because the order page is a live Firestore subscription. Then open the invoice
+and print it to PDF.
+
+---
+
 ## Payments
 
 Live today:
