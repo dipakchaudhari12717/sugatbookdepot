@@ -178,7 +178,7 @@ export default function AdminSettingsPage() {
           </p>
           <Field label="Which version to show">
             <Select
-              value={draft.bannerLang ?? "both"}
+              value={draft.bannerLang ?? "en"}
               onChange={(e) => set("bannerLang", e.target.value as "both" | "mr" | "en" | "off")}
             >
               <option value="both">Both — Marathi above English</option>

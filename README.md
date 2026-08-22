@@ -301,6 +301,25 @@ They appear nowhere in `src/` — only `scripts/seed-firestore.mjs` and
 Note that `.env.example` is a template committed to a public repository. Real
 values go in `.env.local`, which is gitignored.
 
+### Images from the admin panel
+
+The banner, gallery, blog and product editors all accept a pasted URL, so the
+site has to cope with one that is not an image.
+
+`src/lib/image-hosts.mjs` lists the hosts `next/image` may optimise. It is
+imported by both `next.config.mjs` and `MediaImage`, so the two cannot drift.
+Being off the list is not a refusal — `MediaImage` just serves those through a
+plain `<img>` instead, unoptimised but working. If the browser reports the
+source will not load at all, the image renders nothing rather than a broken
+icon.
+
+This matters because it has already bitten once: a banner was saved pointing at
+`builder.hostinger.com/...`, which is the Hostinger builder's own page rather
+than an image. In production `/_next/image` answered 400 and the banner showed
+broken; in `next dev` the unconfigured host made `next/image` throw and took the
+whole home page down with it. Add a host here only when it really serves
+images.
+
 ### Building on older Linux
 
 `build` passes `--webpack` on purpose. Next 16 builds with Turbopack by

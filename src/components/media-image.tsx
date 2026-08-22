@@ -1,15 +1,28 @@
 "use client";
 
 import Image from "next/image";
+import { useState } from "react";
 
+import { isOptimisableImage } from "@/lib/image-hosts.mjs";
 import { isInlineImage } from "@/lib/media";
 
 /**
- * Renders an image that may be either a remote URL or a stored data URI.
+ * Renders an image that may be a remote URL, a stored data URI, or — because
+ * the admin panel accepts a pasted link — something that is not an image at
+ * all.
  *
- * Uploaded images live in Firestore as data URIs, which next/image cannot
- * optimise — it would try to route them through the optimiser and fail. Those
- * fall back to a plain <img>; remote URLs keep the full next/image treatment.
+ * Three routes, in order of preference:
+ *
+ *   1. next/image, for our own assets and the hosts listed in image-hosts.mjs.
+ *   2. a plain <img>, for anything else. Uploaded images are Firestore data
+ *      URIs the optimiser cannot touch, and an unrecognised host would make it
+ *      answer 400, so both skip it and still display.
+ *   3. nothing, once the browser reports the source will not load.
+ *
+ * That last step matters more than it looks. A banner was once saved with a
+ * link to the Hostinger builder rather than to an image; next/image threw on
+ * the unconfigured host and took the whole home page down with it. A picture
+ * that fails to load should cost its own space and nothing else.
  */
 export function MediaImage({
   src,
@@ -32,7 +45,17 @@ export function MediaImage({
   priority?: boolean;
   style?: React.CSSProperties;
 }) {
-  if (isInlineImage(src)) {
+  // Keyed on src so swapping the source (colour swatches, gallery) retries.
+  const [failed, setFailed] = useState<string | null>(null);
+  if (failed === src) return null;
+
+  // `fill` positions against the nearest positioned ancestor, matching what
+  // next/image does, so callers can swap between the two freely.
+  const rawStyle = fill
+    ? ({ position: "absolute", inset: 0, width: "100%", height: "100%", ...style } as const)
+    : style;
+
+  if (isInlineImage(src) || !isOptimisableImage(src)) {
     return (
       // eslint-disable-next-line @next/next/no-img-element
       <img
@@ -40,41 +63,25 @@ export function MediaImage({
         alt={alt}
         className={className}
         loading={priority ? "eager" : "lazy"}
-        // `fill` positions against the nearest positioned ancestor, matching
-        // what next/image does, so callers can swap between the two freely.
-        style={
-          fill
-            ? { position: "absolute", inset: 0, width: "100%", height: "100%", ...style }
-            : style
-        }
+        onError={() => setFailed(src)}
+        style={rawStyle}
       />
     );
   }
 
-  if (fill) {
-    return (
-      <Image
-        src={src}
-        alt={alt}
-        fill
-        sizes={sizes}
-        className={className}
-        priority={priority}
-        style={style}
-      />
-    );
-  }
+  const common = {
+    src,
+    alt,
+    sizes,
+    className,
+    priority,
+    style,
+    onError: () => setFailed(src),
+  };
 
-  return (
-    <Image
-      src={src}
-      alt={alt}
-      width={width ?? 800}
-      height={height ?? 600}
-      sizes={sizes}
-      className={className}
-      priority={priority}
-      style={style}
-    />
+  return fill ? (
+    <Image {...common} fill />
+  ) : (
+    <Image {...common} width={width ?? 800} height={height ?? 600} />
   );
 }

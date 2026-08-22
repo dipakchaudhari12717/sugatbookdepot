@@ -53,7 +53,7 @@ export const DEFAULT_SETTINGS: StoreSettings = {
   codEnabled: true,
   razorpayEnabled: true,
   announcement: "Free delivery across India on orders above ₹499",
-  bannerLang: "both",
+  bannerLang: "en",
   whatsappNumber: "917709001950",
   contactEmail: "sugat4books@gmail.com",
   contactPhone: "+91 90283 60464",
