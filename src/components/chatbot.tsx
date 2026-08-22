@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { MessageSquareText, RotateCcw, Send, X } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
+import { isRazorpayConfigured } from "@/lib/firebase";
 import { useCatalog } from "@/lib/catalog-context";
 import { cn, formatPrice } from "@/lib/utils";
 import { WhatsAppIcon } from "./brand-icons";
@@ -41,7 +42,7 @@ interface Rule {
 interface Ctx {
   freeShipping: number;
   shippingFlat: number;
-  upiId: string;
+  onlinePayment: boolean;
   whatsapp: string;
   phone: string;
   email: string;
@@ -106,12 +107,13 @@ const RULES: Rule[] = [
     id: "payment",
     keywords: ["pay", "payment", "upi", "cod", "cash on delivery", "card", "razorpay", "netbanking", "gpay", "phonepe"],
     reply: (c) => ({
-      text:
-        `Two ways to pay right now:\n\n` +
-        `• Cash on Delivery — pay the courier when your parcel arrives.\n` +
-        `• UPI — pay to ${c.upiId} from any UPI app and enter the reference number at checkout. ` +
-        `We confirm the order once the payment shows up.\n\n` +
-        `Card and net-banking will be added once our payment gateway is approved.`,
+      text: c.onlinePayment
+        ? `Two ways to pay:\n\n` +
+          `• Pay online — card, UPI, net banking or wallet, handled securely by ` +
+          `Razorpay. Your order is confirmed the moment the payment goes through.\n` +
+          `• Cash on Delivery — pay the courier when your parcel arrives.`
+        : `Cash on Delivery for now — pay the courier when your parcel arrives.\n\n` +
+          `Card, UPI and net banking are arriving shortly, once our payment gateway is approved.`,
       links: [{ label: "Go to checkout", href: "/checkout" }],
     }),
   },
@@ -266,7 +268,7 @@ export function Chatbot() {
     return {
       freeShipping: settings.freeShippingThreshold,
       shippingFlat: settings.shippingFlatRate,
-      upiId: settings.upiId,
+      onlinePayment: Boolean(settings.razorpayEnabled && isRazorpayConfigured),
       whatsapp: settings.whatsappNumber,
       phone: settings.contactPhone,
       email: settings.contactEmail,

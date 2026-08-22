@@ -3,7 +3,7 @@
 import { MediaImage } from "@/components/media-image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Banknote, Check, ChevronLeft, CreditCard, Lock, Smartphone, Truck } from "lucide-react";
+import { Banknote, Check, ChevronLeft, CreditCard, Lock, Truck } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 
 import { useAuth } from "@/lib/auth-context";
@@ -56,7 +56,6 @@ export function CheckoutPage() {
   const [email, setEmail] = useState("");
   const [notes, setNotes] = useState("");
   const [payment, setPayment] = useState<PaymentMethod>("cod");
-  const [paymentRef, setPaymentRef] = useState("");
   const [saveAddress, setSaveAddress] = useState(true);
   const [errors, setErrors] = useState<Errors>({});
   const [placing, setPlacing] = useState(false);
@@ -118,6 +117,21 @@ export function CheckoutPage() {
     }
   }
 
+  // What checkout can actually offer right now. Razorpay needs both the shop's
+  // switch and real keys in the environment; the two are independent, so a
+  // deployment without keys simply never shows the option.
+  const codAvailable = settings.codEnabled;
+  const razorpayAvailable = Boolean(settings.razorpayEnabled && isRazorpayConfigured);
+  const noMethods = !codAvailable && !razorpayAvailable;
+
+  // Keep the selection on something that exists. Without this, turning COD off
+  // would leave "cod" selected but unshown, and the order would go through as
+  // Cash on Delivery anyway.
+  useEffect(() => {
+    if (payment === "cod" && !codAvailable && razorpayAvailable) setPayment("razorpay");
+    else if (payment === "razorpay" && !razorpayAvailable && codAvailable) setPayment("cod");
+  }, [payment, codAvailable, razorpayAvailable]);
+
   function validate(): boolean {
     const next: Errors = {};
     if (!address.fullName.trim()) next.fullName = "Please enter the recipient's name.";
@@ -134,6 +148,10 @@ export function CheckoutPage() {
   }
 
   async function placeOrder() {
+    if (noMethods) {
+      toast("No payment method is available right now. Please contact the shop.", "error");
+      return;
+    }
     if (!validate()) return;
     if (!pincodeServiceable) {
       toast("We do not deliver to that PIN code yet. Please contact us.", "error");
@@ -194,8 +212,7 @@ export function CheckoutPage() {
         total,
         paymentMethod: payment,
         paymentStatus: payment === "cod" ? "pending" : "awaiting_verification",
-        paymentReference:
-          payment === "upi" ? paymentRef.trim() || null : razorpayPaymentId,
+        paymentReference: razorpayPaymentId,
         trackingCarrier: null,
         trackingNumber: null,
         notes: notes.trim() || null,
@@ -444,7 +461,14 @@ export function CheckoutPage() {
             <h2 className="font-display text-lg font-semibold text-ink">Payment</h2>
 
             <div className="mt-5 space-y-3">
-              {settings.codEnabled && (
+              {noMethods && (
+                <p className="rounded-xl border border-rule bg-paper-sunk p-4 text-xs leading-relaxed text-ink-soft">
+                  No payment method is switched on at the moment. Please contact the shop to
+                  place this order.
+                </p>
+              )}
+
+              {codAvailable && (
                 <button
                   type="button"
                   onClick={() => setPayment("cod")}
@@ -466,7 +490,7 @@ export function CheckoutPage() {
                 </button>
               )}
 
-              {settings.razorpayEnabled && isRazorpayConfigured && (
+              {razorpayAvailable && (
                 <button
                   type="button"
                   onClick={() => setPayment("razorpay")}
@@ -490,54 +514,13 @@ export function CheckoutPage() {
                 </button>
               )}
 
-              {settings.upiEnabled && (
-                <button
-                  type="button"
-                  onClick={() => setPayment("upi")}
-                  className={cn(
-                    "flex w-full items-start gap-3.5 rounded-xl border p-4 text-left transition",
-                    payment === "upi"
-                      ? "border-saffron bg-saffron-wash"
-                      : "border-rule bg-paper hover:border-saffron/50",
-                  )}
-                >
-                  <Smartphone className="mt-0.5 size-5 shrink-0 text-saffron" />
-                  <span className="flex-1">
-                    <span className="block text-sm font-medium text-ink">UPI transfer</span>
-                    <span className="mt-0.5 block text-xs text-ink-faint">
-                      Pay to {settings.upiId}, then enter the reference number below.
-                    </span>
-                  </span>
-                  {payment === "upi" && <Check className="size-4 shrink-0 text-saffron" />}
-                </button>
-              )}
             </div>
-
-            {payment === "upi" && (
-              <div className="mt-4 rounded-xl bg-paper-sunk p-4">
-                <p className="text-xs leading-relaxed text-ink-soft">
-                  Send <strong className="text-ink">{formatPrice(total)}</strong> to{" "}
-                  <strong className="text-ink">{settings.upiId}</strong> from any UPI app, then paste
-                  the 12-digit UTR / reference number here. We confirm your order once the payment
-                  shows up.
-                </p>
-                <div className="mt-3">
-                  <Field label="UPI reference / UTR (optional now)">
-                    <Input
-                      value={paymentRef}
-                      onChange={(e) => setPaymentRef(e.target.value)}
-                      placeholder="e.g. 402512345678"
-                    />
-                  </Field>
-                </div>
-              </div>
-            )}
 
             <p className="mt-4 flex items-start gap-2 text-xs text-ink-faint">
               <Lock className="mt-0.5 size-3.5 shrink-0" />
               {isRazorpayConfigured
-                ? "Card payments are handled entirely by Razorpay — we never see or store your card details."
-                : "Card and net-banking will appear here once the Razorpay keys are added. Cash on Delivery and UPI cover every order in the meantime."}
+                ? "Card, UPI, net banking and wallet payments are handled entirely by Razorpay — those details never reach us."
+                : "Online payment appears here once the Razorpay keys are added. Cash on Delivery covers every order in the meantime."}
             </p>
 
             <div className="mt-5">
@@ -629,12 +612,15 @@ export function CheckoutPage() {
               </div>
             </dl>
 
-            <Button size="lg" full className="mt-6" onClick={placeOrder} loading={placing}>
-              {payment === "cod"
-                ? "Place order"
-                : payment === "razorpay"
-                  ? "Pay securely"
-                  : "Place order & pay"}
+            <Button
+              size="lg"
+              full
+              className="mt-6"
+              onClick={placeOrder}
+              loading={placing}
+              disabled={noMethods}
+            >
+              {payment === "razorpay" ? `Pay ${formatPrice(total)} securely` : "Place order"}
             </Button>
 
             <p className="mt-3 text-center text-[0.6875rem] leading-relaxed text-ink-faint">

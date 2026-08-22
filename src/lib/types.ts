@@ -206,7 +206,6 @@ export interface StoreSettings {
   /** Pincode prefixes the shop delivers to; empty = deliver everywhere. */
   serviceablePincodes: string[];
   codEnabled: boolean;
-  upiEnabled: boolean;
   /**
    * Card / net-banking / wallets through Razorpay. Switching this on only has
    * an effect once RAZORPAY_KEY_ID is present in the environment — the
@@ -214,7 +213,6 @@ export interface StoreSettings {
    * keys behind it.
    */
   razorpayEnabled: boolean;
-  upiId: string;
   announcement: string;
   /** Which shopfront banner shows on the home page. */
   bannerLang: "both" | "mr" | "en" | "off";

@@ -163,11 +163,18 @@ there if you start using a different one.
 Live today:
 
 - **Cash on Delivery**
-- **UPI transfer** — the customer pays your UPI ID and submits the reference
-  number; you verify it and mark the order paid in the admin panel.
-
 - **Card, UPI, net banking and wallets** — through Razorpay. Built and wired up,
   but dormant until the two keys below are set.
+
+The old manual UPI method — pay the shop's UPI ID, then type the UTR in at
+checkout — has been removed. Razorpay covers UPI properly and confirms the
+payment itself, which spares the shop from reconciling reference numbers by
+hand. `PaymentMethod` still accepts `"upi"` so orders already taken that way
+keep rendering in the admin panel, on the customer's order page and on their
+invoice. `upiEnabled` and `upiId` are gone from store settings.
+
+If Razorpay has no keys and Cash on Delivery is switched off, checkout says so
+plainly and disables the button rather than silently placing a COD order.
 
 ### Turning Razorpay on
 

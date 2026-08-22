@@ -117,30 +117,7 @@ export default function AdminSettingsPage() {
             <label className="flex cursor-pointer items-start gap-3">
               <input
                 type="checkbox"
-                checked={draft.upiEnabled}
-                onChange={(e) => set("upiEnabled", e.target.checked)}
-                className="mt-0.5 size-4 accent-[var(--color-saffron)]"
-              />
-              <span>
-                <span className="block text-sm font-medium text-ink">UPI transfer</span>
-                <span className="block text-xs text-ink-faint">
-                  Customers pay to your UPI ID and submit the reference number.
-                </span>
-              </span>
-            </label>
-
-            <Field label="UPI ID">
-              <Input
-                value={draft.upiId}
-                onChange={(e) => set("upiId", e.target.value)}
-                placeholder="yourshop@upi"
-              />
-            </Field>
-
-            <label className="flex cursor-pointer items-start gap-3">
-              <input
-                type="checkbox"
-                checked={draft.razorpayEnabled ?? false}
+                checked={draft.razorpayEnabled ?? true}
                 onChange={(e) => set("razorpayEnabled", e.target.checked)}
                 className="mt-0.5 size-4 accent-[var(--color-saffron)]"
               />
