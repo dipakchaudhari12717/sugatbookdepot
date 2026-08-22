@@ -301,6 +301,36 @@ They appear nowhere in `src/` — only `scripts/seed-firestore.mjs` and
 Note that `.env.example` is a template committed to a public repository. Real
 values go in `.env.local`, which is gitignored.
 
+### The film behind the hero
+
+The shop's eight-second promotional film loops silently behind the home page
+hero (`src/components/home/hero-video.tsx`). It is decorative — `aria-hidden`,
+`pointer-events-none`, `tabIndex={-1}` — so it never takes a click or a tab
+stop from the page in front of it.
+
+Readability comes from a paper-coloured scrim, heaviest over the copy column
+and thinning towards the shelf, plus a 2px blur on the film itself. Measured
+against a worst case of a pure black frame, the headline sits at 10:1 and body
+copy at 4.8:1, so both clear WCAG AA whatever frame is showing.
+
+It backs off where it should:
+
+- **`prefers-reduced-motion: reduce`** — poster frame only, no player, and the
+  pause control is not rendered.
+- **Data Saver** — same, since the poster carries the same picture for a few KB.
+- **Phones** — full bleed from `sm` up, but a band across the top below it.
+  Covering a 375 x 1250 hero with a 16:9 film needs a 2300px-wide player showing
+  a vertical sliver of it; the band is 657 x 370 instead and composes properly.
+- **Otherwise** — a pause control, bottom right. Continuous motion needs a way
+  to stop it (WCAG 2.2.2), and it drives the player over `postMessage` rather
+  than pulling in YouTube's API script.
+
+An iframe has no `object-fit`, so the cover maths is done in JS from the
+container's measured size. That measurement is taken directly on mount and only
+then handed to a `ResizeObserver` — observers are tied to the rendering
+lifecycle, so in a background tab one never fires and the film would never size
+itself. `Reveal` was bitten by the same thing with `IntersectionObserver`.
+
 ### Images from the admin panel
 
 The banner, gallery, blog and product editors all accept a pasted URL, so the

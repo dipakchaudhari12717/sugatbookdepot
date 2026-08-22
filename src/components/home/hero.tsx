@@ -8,6 +8,7 @@ import { useCatalog } from "@/lib/catalog-context";
 import { cn, formatPrice } from "@/lib/utils";
 import { LinkButton } from "@/components/ui";
 import { TopBanner } from "@/components/top-banner";
+import { HeroVideo } from "./hero-video";
 
 /**
  * Homepage hero (SRS §5): light and calm rather than the legacy dark banner,
@@ -38,6 +39,10 @@ export function Hero() {
 
   return (
     <section className="relative overflow-hidden">
+      {/* The shop's film, silent and looping, with its own scrim. Sits under
+          the warm wash below, which keeps the page's colour over the top. */}
+      <HeroVideo />
+
       {/* Warm light wash — the "calm, monastic" ground */}
       <div
         aria-hidden
