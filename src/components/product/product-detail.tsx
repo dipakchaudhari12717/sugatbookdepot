@@ -280,18 +280,21 @@ export function ProductDetail({ slug }: { slug: string }) {
             </Link>
           )}
 
+          {/* Marathi leads, English follows a size down — see product-card.tsx. */}
           <h1
             className={cn(
               "mt-3 font-display text-3xl leading-tight font-semibold text-ink sm:text-4xl",
-              hasDevanagari(product.title) && "deva",
+              product.titleMr
+                ? "deva deva-lead"
+                : hasDevanagari(product.title) && "deva",
             )}
           >
-            {product.title}
+            {product.titleMr ?? product.title}
           </h1>
 
           {product.titleMr && (
-            <p className="deva mt-1.5 font-display text-2xl leading-snug text-ink-soft sm:text-3xl">
-              {product.titleMr}
+            <p className="mt-2 font-display text-xl leading-snug font-medium text-ink-soft sm:text-2xl">
+              {product.title}
             </p>
           )}
 

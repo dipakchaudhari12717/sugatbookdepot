@@ -350,14 +350,16 @@ export function SiteHeader() {
                     <div className="min-w-0 flex-1">
                       <p
                         className={cn(
-                          "truncate font-display text-sm font-semibold text-ink",
-                          hasDevanagari(p.title) && "deva",
+                          "truncate font-display font-semibold text-ink",
+                          p.titleMr
+                            ? "deva deva-lead text-[0.9375rem]"
+                            : cn("text-sm", hasDevanagari(p.title) && "deva"),
                         )}
                       >
-                        {p.title}
+                        {p.titleMr ?? p.title}
                       </p>
                       {p.titleMr && (
-                        <p className="deva truncate text-xs text-ink-soft">{p.titleMr}</p>
+                        <p className="truncate text-xs font-medium text-ink-soft">{p.title}</p>
                       )}
                       <p className="truncate text-xs text-ink-faint">
                         {[p.author ?? p.brand, p.language].filter(Boolean).join(" · ")}

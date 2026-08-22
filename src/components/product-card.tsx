@@ -170,23 +170,38 @@ export function ProductCard({
           </p>
         )}
 
-        <h3
-          className={cn(
-            "font-display text-[0.9375rem] leading-snug font-semibold text-ink transition-colors group-hover/card:text-saffron-deep",
-            hasDevanagari(product.title) && "deva",
-          )}
-        >
-          <Link href={`/product/${product.slug}`} className="line-clamp-2">
-            {product.title}
+        {/*
+          The shop's customers know these books by their Marathi and Hindi
+          names, so that title leads and the English sits under it in a smaller
+          face. Both stay inside the heading, so the card still announces itself
+          by both names to a screen reader and to a search engine.
+
+          Where a book has no Devanagari title recorded, the English one leads
+          on its own rather than leaving the card without a heading.
+        */}
+        <h3 className="font-display font-semibold text-ink transition-colors group-hover/card:text-saffron-deep">
+          <Link href={`/product/${product.slug}`} className="block">
+            {product.titleMr ? (
+              <>
+                <span className="deva deva-lead line-clamp-2 block text-[1.0625rem]">
+                  {product.titleMr}
+                </span>
+                <span className="mt-1 line-clamp-1 block text-[0.8125rem] leading-snug font-medium text-ink-soft">
+                  {product.title}
+                </span>
+              </>
+            ) : (
+              <span
+                className={cn(
+                  "line-clamp-2 block text-[0.9375rem] leading-snug",
+                  hasDevanagari(product.title) && "deva",
+                )}
+              >
+                {product.title}
+              </span>
+            )}
           </Link>
         </h3>
-
-        {/* The Marathi/Hindi title, for customers who know the book by that name */}
-        {product.titleMr && (
-          <p className="deva mt-0.5 line-clamp-1 text-[0.8125rem] leading-snug text-ink-soft">
-            {product.titleMr}
-          </p>
-        )}
 
         {product.subtitle && (
           <p className="mt-1 line-clamp-1 text-xs text-ink-faint">{product.subtitle}</p>

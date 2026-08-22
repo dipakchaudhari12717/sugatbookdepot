@@ -107,6 +107,22 @@ body {
   font-family: var(--font-deva);
 }
 
+/*
+ * Devanagari leading a title.
+ *
+ * Only leading is set here. Matras sit above and below the base line and need
+ * more room than Latin, or they collide with the line above.
+ *
+ * Deliberately no font-size: an `em` here resolves against the inherited size
+ * rather than the element's own size utility, so it silently overrode
+ * `text-3xl` and made a heading smaller than the line beneath it. The optical
+ * step up — Devanagari reads smaller than Latin at equal size — is instead
+ * built into the size chosen at each call site.
+ */
+.deva-lead {
+  line-height: 1.42;
+}
+
 ::selection {
   background: var(--color-saffron);
   color: #fff;
