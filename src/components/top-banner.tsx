@@ -35,11 +35,13 @@ export function TopBanner() {
       href="/"
       aria-label="Sugat Book Depot — Buddhist Literature, Dr. Ambedkar Road, Nagpur"
       className={
-        "block overflow-hidden rounded-xl border border-rule bg-white p-1.5 shadow-page " +
-        "transition-shadow hover:shadow-lift " +
-        // One sign fills the column as a single horizontal band; two share the
-        // row instead of stacking, once there is width for it.
-        (single ? "w-full" : "w-full max-w-sm sm:max-w-xl")
+        "mx-auto block overflow-hidden rounded-xl border border-rule bg-white p-1.5 " +
+        "shadow-page transition-shadow hover:shadow-lift " +
+        // Centred, and capped by width rather than height: the sign has to stay
+        // wide enough to read the phone number and address off. Left at the
+        // container's full width it would be over 400px tall and swamp the
+        // headline underneath.
+        (single ? "w-full max-w-2xl lg:max-w-3xl" : "w-full max-w-md sm:max-w-3xl")
       }
     >
       <span className={single ? "block" : "flex flex-col gap-1.5 sm:flex-row sm:gap-2"}>
