@@ -257,6 +257,43 @@ credentials.
 
 `scrape` and `catalog` only matter if the old site changes before it's retired.
 
+### Deploying to Hostinger
+
+Hostinger builds the app on its own server, so the environment variables have
+to be there *before* the build runs — `NEXT_PUBLIC_*` values are compiled into
+the JavaScript bundle, not read when the server starts. Editing a file after
+the build has no effect; it needs a rebuild.
+
+Set them through hPanel rather than by uploading a file:
+
+1. Website Dashboard for the app → **Settings & Redeploy**
+   (or Dashboard → **Deployments** → **Settings & Redeploy**)
+2. Open the **Environment variables** section
+3. **Import .env** — upload `.env.local`, or paste its contents — or add each
+   one by hand
+4. Confirm, and let it **redeploy**. This is required, not optional.
+
+Only these are needed on the server:
+
+```
+NEXT_PUBLIC_FIREBASE_API_KEY
+NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN
+NEXT_PUBLIC_FIREBASE_PROJECT_ID
+NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET
+NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID
+NEXT_PUBLIC_FIREBASE_APP_ID
+NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID
+```
+
+plus the two Razorpay keys once they exist.
+
+`SEED_ADMIN_EMAIL` and `SEED_ADMIN_PASSWORD` must **not** go on the server.
+They appear nowhere in `src/` — only `scripts/seed-firestore.mjs` and
+`scripts/sync-product-content.mjs` use them, and those run from a laptop.
+
+Note that `.env.example` is a template committed to a public repository. Real
+values go in `.env.local`, which is gitignored.
+
 ### Building on older Linux
 
 `build` passes `--webpack` on purpose. Next 16 builds with Turbopack by
