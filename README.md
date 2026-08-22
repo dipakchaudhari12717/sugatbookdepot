@@ -213,6 +213,36 @@ with no keys behind it.
 expiry, any CVV, OTP `1234`. The order should land in Admin → Orders carrying
 the `pay_…` reference.
 
+### If online payment says it is unavailable
+
+Both endpoints live under `src/app/api/razorpay/`, which makes them Next.js
+Route Handlers — they need a Node server. If the host serves the app without
+them, `/api/razorpay/order` answers **404** with an HTML page rather than JSON,
+and no amount of correct keys will help. Distinguish the two:
+
+| Response | Meaning |
+| --- | --- |
+| `404`, HTML body | The route handler is not deployed. The keys are irrelevant. |
+| `503`, JSON `{"error": ...}` | Deployed and reachable, but the keys are missing. |
+| `502`, JSON | Deployed, keys present, Razorpay rejected them. |
+
+Check it directly:
+
+```
+curl -i -X POST https://YOUR-SITE/api/razorpay/order   -H 'Content-Type: application/json' -d '{"amount":100}'
+```
+
+Checkout copes rather than stranding the customer: on a 404 it withdraws the
+Razorpay option for the rest of that visit, switches the selection to Cash on
+Delivery and explains why, while logging the real cause to the console. It does
+not parse the body blindly — an HTML error page used to surface as
+`Unexpected token '<'` to somebody trying to pay.
+
+This has already happened on Hostinger. Dynamic pages, `/orders/[id]` and the
+`/_next/image` optimiser all answered 200 there while every `/api/*` path
+returned Next's prerendered 404, on a build whose own client bundle contained
+the code that calls those routes. Vercel serves them without any of this.
+
 ### How it works
 
 | Piece | File |

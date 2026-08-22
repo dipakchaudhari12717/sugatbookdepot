@@ -51,6 +51,34 @@ function loadScript(): Promise<void> {
   return scriptPromise;
 }
 
+/**
+ * Reads a JSON body without assuming there is one.
+ *
+ * A misconfigured deployment answers these endpoints with an HTML error page,
+ * and calling .json() on that throws `Unexpected token '<'` — a parser message
+ * shown to a customer trying to pay. Anything that is not JSON comes back as
+ * null so the caller can say something useful instead.
+ */
+async function readJson(res: Response): Promise<Record<string, unknown> | null> {
+  if (!res.headers.get("content-type")?.includes("application/json")) return null;
+  try {
+    return (await res.json()) as Record<string, unknown>;
+  } catch {
+    return null;
+  }
+}
+
+/** Raised when the payment endpoints are not reachable on this deployment. */
+export class PaymentUnavailable extends Error {
+  constructor() {
+    super(
+      "Online payment is not available on this site at the moment. " +
+        "Please choose Cash on Delivery, or contact the shop to pay another way.",
+    );
+    this.name = "PaymentUnavailable";
+  }
+}
+
 export class PaymentCancelled extends Error {
   constructor() {
     super("Payment was cancelled.");
@@ -91,8 +119,19 @@ export async function payWithRazorpay(input: PayInput): Promise<PaidResult> {
       phone: input.phone,
     }),
   });
-  const order = await orderRes.json();
-  if (!orderRes.ok) throw new Error(order?.error ?? "Could not start the payment.");
+  const order = await readJson(orderRes);
+  if (!orderRes.ok || !order) {
+    // 404 means the route handler is not deployed at all, rather than the keys
+    // being absent — which the endpoint itself reports as a 503.
+    if (orderRes.status === 404 || !order) {
+      console.error(
+        `[razorpay] /api/razorpay/order answered ${orderRes.status} without JSON. ` +
+          "The route handler is probably not deployed on this host.",
+      );
+      throw new PaymentUnavailable();
+    }
+    throw new Error(String(order.error ?? "Could not start the payment."));
+  }
 
   await loadScript();
   const Razorpay = window.Razorpay;
@@ -100,10 +139,10 @@ export async function payWithRazorpay(input: PayInput): Promise<PaidResult> {
 
   const success = await new Promise<RazorpaySuccess>((resolve, reject) => {
     const rzp = new Razorpay({
-      key: order.keyId,
-      order_id: order.orderId,
-      amount: order.amount,
-      currency: order.currency,
+      key: order.keyId as string,
+      order_id: order.orderId as string,
+      amount: order.amount as number,
+      currency: order.currency as string,
       name: "Sugat Book Depot",
       description: input.description,
       image: "/brand/sugat-mark.png",
@@ -128,17 +167,20 @@ export async function payWithRazorpay(input: PayInput): Promise<PaidResult> {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ ...success, amount: input.amount }),
   });
-  const verified = await verifyRes.json();
-  if (!verifyRes.ok || !verified.verified) {
+  const verified = await readJson(verifyRes);
+  if (!verifyRes.ok || !verified?.verified) {
     throw new Error(
-      verified?.error ??
-        "We could not confirm that payment. If money has left your account, contact us with the payment id.",
+      String(
+        verified?.error ??
+          "We could not confirm that payment. If money has left your account, " +
+            `contact us quoting ${success.razorpay_payment_id} — do not pay again.`,
+      ),
     );
   }
 
   return {
-    paymentId: verified.paymentId,
-    orderId: verified.orderId,
-    method: verified.method ?? null,
+    paymentId: String(verified.paymentId),
+    orderId: String(verified.orderId),
+    method: (verified.method as string | null) ?? null,
   };
 }

@@ -10,7 +10,7 @@ import { useAuth } from "@/lib/auth-context";
 import { useCart } from "@/lib/cart-context";
 import { useCatalog } from "@/lib/catalog-context";
 import { isFirebaseConfigured, isRazorpayConfigured } from "@/lib/firebase";
-import { PaymentCancelled, payWithRazorpay } from "@/lib/razorpay-checkout";
+import { PaymentCancelled, PaymentUnavailable, payWithRazorpay } from "@/lib/razorpay-checkout";
 import { createOrder, evaluateCoupon, findCoupon, updateUserProfile } from "@/lib/repo";
 import { useToast } from "@/lib/toast-context";
 import type { Address, Coupon, PaymentMethod } from "@/lib/types";
@@ -59,6 +59,9 @@ export function CheckoutPage() {
   const [saveAddress, setSaveAddress] = useState(true);
   const [errors, setErrors] = useState<Errors>({});
   const [placing, setPlacing] = useState(false);
+  // Set once the payment endpoints answer 404, so the option stops being
+  // offered for the rest of this checkout.
+  const [razorpayBroken, setRazorpayBroken] = useState(false);
 
   const [code, setCode] = useState("");
   const [coupon, setCoupon] = useState<Coupon | null>(null);
@@ -121,7 +124,9 @@ export function CheckoutPage() {
   // switch and real keys in the environment; the two are independent, so a
   // deployment without keys simply never shows the option.
   const codAvailable = settings.codEnabled;
-  const razorpayAvailable = Boolean(settings.razorpayEnabled && isRazorpayConfigured);
+  const razorpayAvailable = Boolean(
+    settings.razorpayEnabled && isRazorpayConfigured && !razorpayBroken,
+  );
   const noMethods = !codAvailable && !razorpayAvailable;
 
   // Keep the selection on something that exists. Without this, turning COD off
@@ -186,6 +191,16 @@ export function CheckoutPage() {
           // Closing the modal is a normal thing to do, not an error worth
           // shouting about — leave the customer on the filled-in form.
           if (err instanceof PaymentCancelled) {
+            setPlacing(false);
+            return;
+          }
+          // The payment endpoints are missing on this deployment. Nobody
+          // filling in a delivery address can fix that, so move them onto a
+          // method that does work rather than leaving them at a dead end.
+          if (err instanceof PaymentUnavailable) {
+            setRazorpayBroken(true);
+            if (codAvailable) setPayment("cod");
+            toast(err.message, "error");
             setPlacing(false);
             return;
           }
