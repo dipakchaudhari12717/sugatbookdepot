@@ -209,7 +209,11 @@ export function ProductDetail({ slug }: { slug: string }) {
                   fill
                   priority
                   sizes="(max-width: 1024px) 100vw, 45vw"
-                  className="object-cover"
+                  // A book cover fills the 4:5 stage, so cropping it is fine.
+                  // Robes, statues and pens are photographed square or
+                  // landscape — covering them lops 20% off the subject, so
+                  // those are fitted whole against the stage instead.
+                  className={isObject ? "object-contain" : "object-cover"}
                   style={{ animation: "fade 0.35s var(--ease-paper)" }}
                 />
               ) : (
@@ -251,7 +255,13 @@ export function ProductDetail({ slug }: { slug: string }) {
                         : "border-transparent opacity-65 hover:opacity-100",
                     )}
                   >
-                    <MediaImage src={src} alt="" fill sizes="80px" className="object-cover" />
+                    <MediaImage
+                      src={src}
+                      alt=""
+                      fill
+                      sizes="80px"
+                      className={isObject ? "object-contain" : "object-cover"}
+                    />
                   </button>
                 ))}
               </div>

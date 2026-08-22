@@ -166,11 +166,78 @@ Live today:
 - **UPI transfer** — the customer pays your UPI ID and submits the reference
   number; you verify it and mark the order paid in the admin panel.
 
-Card and net-banking need a payment gateway. The SRS names Razorpay or PayU, both
-of which require business KYC approval before you get API keys. Once you have
-them, the gateway slots in alongside the two existing methods — the order model
-already carries `paymentMethod`, `paymentStatus` and `paymentReference`, and the
-admin panel already exposes the refund/paid states.
+- **Card, UPI, net banking and wallets** — through Razorpay. Built and wired up,
+  but dormant until the two keys below are set.
+
+### Turning Razorpay on
+
+Razorpay needs business KYC approval before it will issue live keys. Test keys
+are available immediately and behave identically, so the flow can be rehearsed
+end to end before KYC clears.
+
+**1. Get the keys.** Razorpay Dashboard → Settings → API Keys → Generate Key.
+You get a pair:
+
+| Key | Where it goes | Notes |
+| --- | --- | --- |
+| Key Id (`rzp_test_…` / `rzp_live_…`) | `NEXT_PUBLIC_RAZORPAY_KEY_ID` | Public. Ships to the browser by design. |
+| Key Secret | `RAZORPAY_KEY_SECRET` | Secret. Server only — never prefix it `NEXT_PUBLIC_`. |
+
+The secret is displayed **once**, at generation. Lose it and you must
+regenerate the pair.
+
+**2. Add them to the environment.**
+
+- Local: put both in `.env.local` (already gitignored).
+- Vercel: Project → Settings → Environment Variables, add both, then redeploy.
+  A redeploy is required — Next inlines the public key at build time.
+
+```
+NEXT_PUBLIC_RAZORPAY_KEY_ID=rzp_test_xxxxxxxxxxxxxx
+RAZORPAY_KEY_SECRET=xxxxxxxxxxxxxxxxxxxxxxxx
+```
+
+**3. Switch it on.** Admin → Settings → tick *Card, UPI, net banking &
+wallets*. The option is double-gated: it appears at checkout only when the
+setting is ticked **and** the key id is present, so it can never be offered
+with no keys behind it.
+
+**4. Test.** With `rzp_test_` keys, card `4111 1111 1111 1111`, any future
+expiry, any CVV, OTP `1234`. The order should land in Admin → Orders carrying
+the `pay_…` reference.
+
+### How it works
+
+| Piece | File |
+| --- | --- |
+| Opens a Razorpay order (holds the secret) | `src/app/api/razorpay/order/route.ts` |
+| Verifies the payment before the order is saved | `src/app/api/razorpay/verify/route.ts` |
+| REST + HMAC helpers, server only | `src/lib/razorpay-server.ts` |
+| Loads the widget, drives the modal | `src/lib/razorpay-checkout.ts` |
+| Calls the above from checkout | `src/components/checkout/checkout-page.tsx` |
+
+No SDK is installed — it is `fetch` against Razorpay's REST API plus
+`node:crypto` for the signature, so there is nothing extra to keep patched.
+
+Verification is deliberately two-sided, because a signature alone proves only
+that the browser saw a genuine Razorpay response and says nothing about the
+amount:
+
+1. the HMAC handshake, which rules out a forged callback, and
+2. a read straight from Razorpay confirming the payment is **captured**, is
+   attached to the order we opened, and is for the amount we expected.
+
+Only then is the order written to Firestore, with the `pay_…` id stored as
+`paymentReference`.
+
+**Two things to know.** Orders arrive as `awaiting_verification` rather than
+`paid`, because `firestore.rules` lets only an admin set `paid` and the write
+happens in the browser — mark it paid in the admin panel, where the Razorpay
+reference is shown. And the amount charged is the cart total computed on the
+client; the server checks that what was *paid* matches what was *asked for*,
+but does not independently re-price the cart. Closing that gap needs the
+Firebase Admin SDK on the server, which is a larger change and a further set of
+credentials.
 
 ---
 

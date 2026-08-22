@@ -1,6 +1,12 @@
-import type { NextConfig } from "next";
+// Plain .mjs rather than .ts on purpose. Next compiles a TypeScript config
+// through SWC before it can read it, and on hosts with an old glibc (Hostinger
+// shared hosting is glibc < 2.29) the native SWC binary refuses to load. The
+// wasm fallback then fails to resolve the temp file it just wrote, so the build
+// dies on "Failed to load next.config.ts" before it compiles a single page.
+// A .mjs config is imported by Node directly and sidesteps that entirely.
 
-const nextConfig: NextConfig = {
+/** @type {import('next').NextConfig} */
+const nextConfig = {
   images: {
     // Product photography still lives on the legacy builder's CDN. Admins can
     // paste any https image URL, so we allow the CDN hosts we know plus the

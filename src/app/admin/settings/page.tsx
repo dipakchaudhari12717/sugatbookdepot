@@ -159,7 +159,7 @@ export default function AdminSettingsPage() {
             <p className="rounded-xl bg-paper-sunk px-4 py-3 text-xs leading-relaxed text-ink-soft">
               {isRazorpayConfigured
                 ? "Razorpay is live. Payments settle to the bank account registered on your Razorpay dashboard."
-                : "To switch card payments on, add NEXT_PUBLIC_RAZORPAY_KEY_ID, RAZORPAY_KEY_SECRET and RAZORPAY_WEBHOOK_SECRET to the site's environment variables. Nothing else needs to change."}
+                : "To switch card payments on, add NEXT_PUBLIC_RAZORPAY_KEY_ID and RAZORPAY_KEY_SECRET to the site's environment variables, then redeploy. Nothing else needs to change."}
             </p>
           </div>
         </Card>

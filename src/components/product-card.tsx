@@ -70,7 +70,10 @@ export function ProductCard({
               priority={priority}
               sizes="(max-width: 640px) 45vw, (max-width: 1024px) 30vw, 22vw"
               className={cn(
-                "object-cover transition-transform duration-700 ease-[var(--ease-paper)]",
+                "transition-transform duration-700 ease-[var(--ease-paper)]",
+                // Same reasoning as the detail gallery: covers fill the tile,
+                // photographed objects are fitted whole.
+                isObject ? "object-contain" : "object-cover",
                 "group-hover/card:scale-[1.04]",
               )}
             />

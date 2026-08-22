@@ -10,6 +10,7 @@ import { useAuth } from "@/lib/auth-context";
 import { useCart } from "@/lib/cart-context";
 import { useCatalog } from "@/lib/catalog-context";
 import { isFirebaseConfigured, isRazorpayConfigured } from "@/lib/firebase";
+import { PaymentCancelled, payWithRazorpay } from "@/lib/razorpay-checkout";
 import { createOrder, evaluateCoupon, findCoupon, updateUserProfile } from "@/lib/repo";
 import { useToast } from "@/lib/toast-context";
 import type { Address, Coupon, PaymentMethod } from "@/lib/types";
@@ -144,7 +145,41 @@ export function CheckoutPage() {
     }
 
     setPlacing(true);
+    // Reference of a settled Razorpay payment, kept so it can be written onto
+    // the order and quoted back to the customer if anything later fails.
+    let razorpayPaymentId: string | null = null;
+
     try {
+      if (payment === "razorpay") {
+        try {
+          const paid = await payWithRazorpay({
+            amount: total,
+            receipt: `sbd-${Date.now()}`,
+            name: address.fullName.trim(),
+            email: email.trim(),
+            phone: address.phone.trim(),
+            description:
+              lines.length === 1
+                ? lines[0].title
+                : `${lines.length} items from Sugat Book Depot`,
+          });
+          razorpayPaymentId = paid.paymentId;
+        } catch (err) {
+          // Closing the modal is a normal thing to do, not an error worth
+          // shouting about — leave the customer on the filled-in form.
+          if (err instanceof PaymentCancelled) {
+            setPlacing(false);
+            return;
+          }
+          toast(
+            err instanceof Error ? err.message : "The payment did not go through.",
+            "error",
+          );
+          setPlacing(false);
+          return;
+        }
+      }
+
       const order = await createOrder({
         userId: user?.uid ?? null,
         isGuest: !user,
@@ -159,7 +194,8 @@ export function CheckoutPage() {
         total,
         paymentMethod: payment,
         paymentStatus: payment === "cod" ? "pending" : "awaiting_verification",
-        paymentReference: payment === "upi" ? paymentRef.trim() || null : null,
+        paymentReference:
+          payment === "upi" ? paymentRef.trim() || null : razorpayPaymentId,
         trackingCarrier: null,
         trackingNumber: null,
         notes: notes.trim() || null,
@@ -183,7 +219,15 @@ export function CheckoutPage() {
       router.push(`/orders/${order.id}?placed=1`);
     } catch (err) {
       console.error("[checkout] order failed", err);
-      toast("We could not place that order. Please try again.", "error");
+      if (razorpayPaymentId) {
+        // The money has already left their account. Never tell them to retry.
+        toast(
+          `Your payment went through (${razorpayPaymentId}) but we could not save the order. Please contact us with that reference — do not pay again.`,
+          "error",
+        );
+      } else {
+        toast("We could not place that order. Please try again.", "error");
+      }
       setPlacing(false);
     }
   }
