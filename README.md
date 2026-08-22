@@ -238,10 +238,20 @@ Delivery and explains why, while logging the real cause to the console. It does
 not parse the body blindly — an HTML error page used to surface as
 `Unexpected token '<'` to somebody trying to pay.
 
-This has already happened on Hostinger. Dynamic pages, `/orders/[id]` and the
-`/_next/image` optimiser all answered 200 there while every `/api/*` path
-returned Next's prerendered 404, on a build whose own client bundle contained
-the code that calls those routes. Vercel serves them without any of this.
+This has already happened on Hostinger, and the same commit settles who is at
+fault. Posting the same body to both deployments:
+
+| Host | Response |
+| --- | --- |
+| `sugatbookdepot.vercel.app` | `503 application/json` — `{"error":"Razorpay is not configured on this deployment."}` |
+| `www.sugatbookdepot.in` | `404 text/html` |
+
+The handler exists, runs, and reports its own state correctly on Vercel. On
+Hostinger it is not there at all. Dynamic pages, `/orders/[id]` and the
+`/_next/image` optimiser all answer 200 on that host, and a lazily-imported
+client chunk referenced by its own RSC stream answered 404 as well — so the
+deployed `.next` is missing more than the route handlers. Nothing in this
+repository can fix that; it is the host, not the build.
 
 ### How it works
 
