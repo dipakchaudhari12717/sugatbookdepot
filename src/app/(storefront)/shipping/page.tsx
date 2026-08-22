@@ -31,7 +31,7 @@ export default function Page() {
         {
           heading: "Tracking your order",
           body: [
-            "Every order gets an order number in the form SBD-XXXXXX. Use it on the Track order page, or open the order from your account.",
+            "Every order gets an order number in the form SBD-12345-22082026 — a serial and the date it was placed. Use it on the Track order page, or open the order from your account.",
             "Once your parcel is handed to the courier, the tracking number appears on your order page.",
           ],
         },

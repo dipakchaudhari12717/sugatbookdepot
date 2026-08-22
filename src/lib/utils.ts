@@ -71,14 +71,33 @@ export function decodeSlugParam(raw: string) {
   return decoded.normalize("NFC");
 }
 
-/** SBD-7K2M9 — short, human-readable, and easy to read out over the phone. */
-export function generateOrderNumber() {
-  const alphabet = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
-  let suffix = "";
-  for (let i = 0; i < 6; i++) {
-    suffix += alphabet[Math.floor(Math.random() * alphabet.length)];
-  }
-  return `SBD-${suffix}`;
+/**
+ * SBD-12345-22082026 — the shop's prefix, a five-digit serial, and the date the
+ * order was placed as DDMMYYYY.
+ *
+ * The date is taken in Asia/Kolkata rather than from the customer's clock. A
+ * device set to another timezone would otherwise stamp an order placed late in
+ * the evening with the day before, and the number would disagree with the
+ * invoice beside it.
+ *
+ * The serial is random rather than sequential, so no counter has to be shared
+ * between customers checking out at the same moment. Two orders only clash if
+ * they draw the same five digits on the same day: at twenty orders a day that
+ * is roughly a one-in-five-hundred chance, and the shop would see it as a
+ * duplicate rather than lose an order.
+ */
+export function generateOrderNumber(at: Date = new Date()) {
+  const serial = String(Math.floor(10000 + Math.random() * 90000));
+
+  const parts = new Intl.DateTimeFormat("en-GB", {
+    timeZone: "Asia/Kolkata",
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+  }).formatToParts(at);
+  const part = (type: string) => parts.find((p) => p.type === type)?.value ?? "";
+
+  return `SBD-${serial}-${part("day")}${part("month")}${part("year")}`;
 }
 
 /** Stable key for a product + chosen options, so the cart merges duplicates. */

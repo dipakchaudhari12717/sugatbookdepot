@@ -96,7 +96,7 @@ const RULES: Rule[] = [
       text:
         `You can follow an order from Placed → Confirmed → Packed → Shipped → Delivered.\n\n` +
         `If you have an account, open My orders. If you checked out as a guest, use your order ` +
-        `number (it looks like SBD-XXXXXX) on the tracking page.`,
+        `number (it looks like SBD-12345-22082026) on the tracking page.`,
       links: [
         { label: "Track an order", href: "/orders" },
         { label: "My account", href: "/account" },

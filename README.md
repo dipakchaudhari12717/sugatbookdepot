@@ -191,9 +191,25 @@ Delivered, each stamped with its time), the items, the address, the totals, a
 Getting back to it later:
 
 - **Signed in** — *Account → Orders*, or `/orders`, lists everything on that
-  account.
-- **Guest** — `/orders` has a *Track an order* box; the order number is enough.
-  No sign-in, because guests can check out (FR-3.4).
+  account. This works.
+- **The confirmation link** — `/orders/<id>` opens for anyone holding it, signed
+  in or not. This works, and is the path to demonstrate.
+- **Guest tracking by order number** — `/orders` shows a *Track an order* box,
+  and it does **not** currently work. See below.
+
+> **Known: the guest tracking box is blocked by the security rules.**
+> `findOrderByNumber` looks an order up with a query, and `firestore.rules`
+> allows `list` on `orders` only for an admin or a signed-in user, so a guest
+> gets `permission-denied`. Verified against the live project. The box is
+> visible but cannot return anything.
+>
+> The tidy fix is to make the order number the document id, so the lookup
+> becomes a direct `get` — which the rules already allow for anyone — instead of
+> a query. That would also make a duplicate number impossible, since a second
+> write to the same id is an `update` and the rules refuse those to non-admins.
+> It changes how orders are created, so it has not been done on the quiet.
+>
+> Until then, demonstrate with the confirmation link or a signed-in account.
 
 ### 3. The invoice
 
@@ -589,6 +605,12 @@ Everything runs inside the Firebase Spark (free) plan:
    number per order, which appears on the customer's order page. Automatic label
    generation via Shiprocket/Delhivery (FR-9.1) needs a courier account.
 4. **Product reviews** have rules and a data model in place but no UI yet.
-5. **The gallery and blog start empty.** Both are admin-authored — add the first
+5. **The guest "Track an order" box does not work.** Looking an order up by its
+   number is a query, and `firestore.rules` allows `list` on `orders` only for
+   an admin or a signed-in user, so a guest gets `permission-denied`. Signed-in
+   order history and the confirmation link both work. The fix is to key order
+   documents by their order number so the lookup becomes a `get`, which the
+   rules already permit — see *Walking a client through an order*.
+6. **The gallery and blog start empty.** Both are admin-authored — add the first
    photographs and posts under **Admin → Gallery** and **Admin → Blog**. Until
    then the public pages show a friendly empty state rather than broken layout.
