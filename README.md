@@ -246,7 +246,7 @@ credentials.
 | Command | What it does |
 |---|---|
 | `npm run dev` | Development server |
-| `npm run build` | Production build |
+| `npm run build` | Production build (Webpack — see *Building on older Linux* below) |
 | `npm run start` | Serve the production build |
 | `npm run typecheck` | TypeScript, no emit |
 | `npm run scrape` | Re-scrape the legacy site → `data/legacy-catalog.json` |
@@ -256,6 +256,38 @@ credentials.
 | `npm run rules:deploy` | Deploy `firestore.rules` + indexes (needs `firebase login` once) |
 
 `scrape` and `catalog` only matter if the old site changes before it's retired.
+
+### Building on older Linux
+
+`build` passes `--webpack` on purpose. Next 16 builds with Turbopack by
+default, and Turbopack needs the native SWC binary — it has no WebAssembly
+fallback.
+
+That binary wants glibc 2.29 or newer. Hostinger's shared hosting is older
+than that, so the build there fails twice over:
+
+```
+Attempted to load @next/swc-linux-x64-gnu, but an error occurred:
+  /lib64/libm.so.6: version `GLIBC_2.29' not found
+Turbopack is not supported on this platform (linux/x64) because native
+  bindings are not available.
+```
+
+Webpack does run on the WebAssembly fallback, so `--webpack` builds
+everywhere — slower, but it finishes. This is also why the Next config is
+`next.config.mjs` rather than `.ts`: a TypeScript config has to be compiled by
+SWC before it can even be read, which fails on the same host before a single
+page is built.
+
+None of this applies to Vercel, whose builders are current; the flag only
+costs some build time there.
+
+The deprecation warnings and the six moderate advisories `npm install` prints
+all come from `firebase-admin`, a devDependency used solely by
+`scripts/seed-firestore.mjs`. Nothing from it reaches the browser or the
+running site. They are noise, not the build failure — leave them be rather
+than running `npm audit fix --force`, which would try to move `firebase-admin`
+across a major version for no gain.
 
 ---
 
