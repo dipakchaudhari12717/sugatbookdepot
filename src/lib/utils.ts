@@ -72,8 +72,8 @@ export function decodeSlugParam(raw: string) {
 }
 
 /**
- * SBD-12345-22082026 — the shop's prefix, a five-digit serial, and the date the
- * order was placed as DDMMYYYY.
+ * SBD-22082026-12345 — the shop's prefix, the date the order was placed as
+ * DDMMYYYY, then a five-digit serial.
  *
  * The date is taken in Asia/Kolkata rather than from the customer's clock. A
  * device set to another timezone would otherwise stamp an order placed late in
@@ -97,7 +97,7 @@ export function generateOrderNumber(at: Date = new Date()) {
   }).formatToParts(at);
   const part = (type: string) => parts.find((p) => p.type === type)?.value ?? "";
 
-  return `SBD-${serial}-${part("day")}${part("month")}${part("year")}`;
+  return `SBD-${part("day")}${part("month")}${part("year")}-${serial}`;
 }
 
 /** Stable key for a product + chosen options, so the cart merges duplicates. */

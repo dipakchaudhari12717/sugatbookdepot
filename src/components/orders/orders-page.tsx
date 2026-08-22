@@ -176,7 +176,7 @@ export function OrdersPage() {
                 <Input
                   value={lookup}
                   onChange={(e) => setLookup(e.target.value.toUpperCase())}
-                  placeholder="SBD-12345-22082026"
+                  placeholder="SBD-22082026-12345"
                   className="uppercase"
                 />
               </Field>
